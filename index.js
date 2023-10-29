@@ -1,5 +1,4 @@
 const { Client, IntentsBitField, Routes, REST, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const fs = require('fs');
 
 // ############################
 // Initial Setup
@@ -57,7 +56,7 @@ setupCommands();
 client.login(DISCORD_DEV_TOKEN);
 
 // ############################
-// Functionality
+// Helper Functions
 //#############################
 
 function randomIntFromInterval(min, max) { // min and max included 
@@ -80,14 +79,16 @@ function getFirstLine(user, name) {
     case 3:
     case 4:
     case 5:
+      return `Everyone join me in welcoming ${user} (A.K.A ${name}) to The Gayborhood!!`;
     case 6:
     case 7:
+      return `Gayborhood Association is proud to present ${user} (A.K.A ${name}) as the newest member on the block`;
     case 8:
-      return `Everyone join me in welcoming ${user} (A.K.A ${name}) to The Gayborhood!!`;
+      return `The Gayborhood is just taking in anybody these days.... say hi to ${user} aka ${name}.`;
     case 9:
       return `The Gayborhood had a ${user} sized hole and they've decided to fill it. Thank you for filling our hole ${name}!`;
     case 10:
-      return `UWU the Gayborhood just got more kawaii ^-^, someone just joined and its a cutie patootie called senpai ${user} (but u bakas can call them ${name}).`;
+      return `uwu the Gayborhood just got a bit more kawaii ^-^, someone joined and its a cutie patootie called senpai ${user} (but u bakas can call them ${name}).`;
     default:
       return `Everyone join me in welcoming ${user} (A.K.A ${name}) to The Gayborhood!!`;
   }
@@ -101,12 +102,23 @@ function getSecondLine(name, age, location) {
     case 4:
     case 5:
     case 6:
-    case 7:
       return `${name} is ${age} years old and is from ${location}.`;
-    case 8:
-    case 9:
-      if (parseInt(age) && parseInt(age) < 30) {
+    case 7:
+      if (!parseInt(age)) {
         break;
+      }
+      if (parseInt(age) < 30) {
+        return `This widdle bubba has been growing for ${age} years into a big stwong independent pewson. The stalk they were born from is in ${location}.`;
+      }
+      return `Contrary to popular belief, ${name} is actually ${age} years old! The air quality in ${location} must be great for them to look so good.`;
+    case 8:
+      return `Seasoned to perfection, ${name} is ${age} years old! Seasoned with that good ol' ${location} seasoning, so you know its good.`;
+    case 9:
+      if (!parseInt(age)) {
+        break;
+      }
+      if (parseInt(age) < 30) {
+        return `All the way from ${location} this undisputed baddie has been a reigning WWE champ for ${age} years and counting.`;
       }
       return `Though they look much younger, ${name} is actually ${age} years old! Must be something in the water over there in ${location}.`;
     case 10:
@@ -123,10 +135,13 @@ function getFinalLine(name, hobbies) {
     case 4:
     case 5:
     case 6:
-    case 7:
-    case 8:
       return `${name}s hobbies and interests include: ${hobbies}`;
+    case 7:
+      return `Besides sniffing the seats on public transport, ${name}s hobbies and interests include: ${hobbies}`;
+    case 8:
+      return `When they're not saving kittens from trees, ${name} likes: ${hobbies}`;
     case 9:
+      return `Besides eating eating beans in the movie theater, ${name}s hobbies and interests include: ${hobbies}`
     case 10:
       return `When they're not setting fire to orphanages, ${name} likes: ${hobbies}`;
     default:
@@ -196,146 +211,172 @@ function getLogButtonMessage(interaction, introMessage) {
   return message;
 }
 
-client.on('interactionCreate', async (interaction) => {
-  if(interaction.commandName === 'intro') {
-    const modal = new ModalBuilder()
-			.setCustomId('introModal')
-			.setTitle('Tell Us About Yourself');
+function getIntroModal() {
+  const modal = new ModalBuilder()
+    .setCustomId('introModal')
+    .setTitle('Tell Us About Yourself');
 
-      const ageInput = new TextInputBuilder()
-      .setCustomId('ageInput')
-			.setLabel("How old are you?")
-      .setMaxLength(2)
-      .setMinLength(1)
-      .setPlaceholder('Enter a number!')
-      .setRequired(true)
-			.setStyle(TextInputStyle.Short);
+  const ageInput = new TextInputBuilder()
+    .setCustomId('ageInput')
+    .setLabel("How old are you?")
+    .setMaxLength(2)
+    .setMinLength(1)
+    .setPlaceholder('Enter a number!')
+    .setRequired(true)
+    .setStyle(TextInputStyle.Short);
 
-      const nameInput = new TextInputBuilder()
-      .setCustomId('nameInput')
-			.setLabel("What would you prefer we call you?")
-      .setMaxLength(25)
-      .setMinLength(1)
-      .setPlaceholder('Enter some text!')
-      .setRequired(true)
-			.setStyle(TextInputStyle.Short);
+  const nameInput = new TextInputBuilder()
+    .setCustomId('nameInput')
+    .setLabel("What would you prefer we call you?")
+    .setMaxLength(25)
+    .setMinLength(1)
+    .setPlaceholder('Enter some text!')
+    .setRequired(true)
+    .setStyle(TextInputStyle.Short);
 
-      const pronounInput = new TextInputBuilder()
-      .setCustomId('pronounInput')
-			.setLabel("What are your preferred pronouns?")
-      .setMaxLength(25)
-      .setMinLength(1)
-      .setPlaceholder('Enter some text!')
-      .setRequired(true)
-			.setStyle(TextInputStyle.Short);
+  const pronounInput = new TextInputBuilder()
+    .setCustomId('pronounInput')
+    .setLabel("What are your preferred pronouns?")
+    .setMaxLength(25)
+    .setMinLength(1)
+    .setPlaceholder('Enter some text!')
+    .setRequired(true)
+    .setStyle(TextInputStyle.Short);
 
-      const locationInput = new TextInputBuilder()
-      .setCustomId('locationInput')
-			.setLabel("Where are you from?")
-      .setMaxLength(25)
-      .setMinLength(1)
-      .setPlaceholder('Enter some text!')
-      .setRequired(true)
-			.setStyle(TextInputStyle.Short);
+  const locationInput = new TextInputBuilder()
+    .setCustomId('locationInput')
+    .setLabel("Where are you from?")
+    .setMaxLength(25)
+    .setMinLength(1)
+    .setPlaceholder('Enter some text!')
+    .setRequired(true)
+    .setStyle(TextInputStyle.Short);
 
-      const hobbiesInput = new TextInputBuilder()
-      .setCustomId('hobbiesInput')
-			.setLabel("What's some of your hobbies/interests?")
-      .setMaxLength(200)
-      .setMinLength(20)
-      .setPlaceholder('Enter some text!')
-      .setRequired(true)
-			.setStyle(TextInputStyle.Paragraph);
+  const hobbiesInput = new TextInputBuilder()
+    .setCustomId('hobbiesInput')
+    .setLabel("What's some of your hobbies/interests?")
+    .setMaxLength(200)
+    .setMinLength(20)
+    .setPlaceholder('Enter some text!')
+    .setRequired(true)
+    .setStyle(TextInputStyle.Paragraph);
 
-      const firstActionRow = new ActionRowBuilder().addComponents(ageInput);
-      const secondActionRow = new ActionRowBuilder().addComponents(nameInput);
-      const thirdActionRow = new ActionRowBuilder().addComponents(pronounInput);
-      const fourthActionRow = new ActionRowBuilder().addComponents(locationInput);
-      const fifthActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
+  const firstActionRow = new ActionRowBuilder().addComponents(ageInput);
+  const secondActionRow = new ActionRowBuilder().addComponents(nameInput);
+  const thirdActionRow = new ActionRowBuilder().addComponents(pronounInput);
+  const fourthActionRow = new ActionRowBuilder().addComponents(locationInput);
+  const fifthActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
 
-      modal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fifthActionRow);
+  modal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fifthActionRow);
 
-      await interaction.showModal(modal);
+  return modal;
+}
+
+async function handleModalSubmit(interaction) {
+  interaction.reply({
+    content: 'Generating your intro now! Server staff will review it and grant you entrance in to the server.',
+    ephemeral: true
+  })
+
+  age = parseInt(interaction.fields.getTextInputValue('ageInput'));
+
+  if (!age || age < 18) {
+    handleUnderageUser(interaction, age)
+  } else {
+    await sendIntroAndLogMessage(interaction)
   }
+}
 
-  if(interaction.isModalSubmit()) {
-    // do this after so we can catch error and ask the user to try again
-    interaction.reply({
-      content: 'Generating your intro now! Server staff will review it and grant you entrance in to the server.',
-      ephemeral: true
-    })
+function handleUnderageUser(interaction, age) {
+  const ban = new ButtonBuilder()
+      .setCustomId('ban')
+      .setLabel('Ban')
+      .setStyle(ButtonStyle.Danger);
 
-    age = parseInt(interaction.fields.getTextInputValue('ageInput'));
+    const row = new ActionRowBuilder()
+      .addComponents(ban);
+    
+    client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
+      content: `🚨👮<(Underage user detected. ${interaction.member.user} claims to be ${age} years old)🚨`,
+      components: [row],
+    });
+}
 
-    if (!age || age < 18) {
+async function sendIntroAndLogMessage(interaction) {
+  const approve = new ButtonBuilder()
+      .setCustomId('approve')
+      .setLabel('Approve')
+      .setStyle(ButtonStyle.Primary);
+
       const ban = new ButtonBuilder()
-        .setCustomId('ban')
-        .setLabel('Ban')
-        .setStyle(ButtonStyle.Danger);
-  
-      const row = new ActionRowBuilder()
-        .addComponents(ban);
-      
-      client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
-        content: `🚨👮<(Underage user detected. ${interaction.member.user} claims to be ${age} years old)🚨`,
-        components: [row],
-      });
-    } else {
-      const approve = new ButtonBuilder()
-        .setCustomId('approve')
-        .setLabel('Approve')
-        .setStyle(ButtonStyle.Primary);
+      .setCustomId('ban')
+      .setLabel('Ban')
+      .setStyle(ButtonStyle.Danger);
 
-        const ban = new ButtonBuilder()
-        .setCustomId('ban')
-        .setLabel('Ban')
-        .setStyle(ButtonStyle.Danger);
-  
-      const row = new ActionRowBuilder()
-        .addComponents(approve, ban);
-  
-      const introMessage = await client.channels.cache.get(mapStartChannelIdToIntroChannelId(interaction.channelId)).send({
-        content: generateIntro(interaction)
-      });
-  
-      client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
-        content: getLogButtonMessage(interaction, introMessage),
-        components: [row],
-      });
-    }
+    const row = new ActionRowBuilder()
+      .addComponents(approve, ban);
+
+    const introMessage = await client.channels.cache.get(mapStartChannelIdToIntroChannelId(interaction.channelId)).send({
+      content: generateIntro(interaction)
+    });
+
+    client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
+      content: getLogButtonMessage(interaction, introMessage),
+      components: [row],
+    });
+}
+
+function handleButtonClick(interaction) {
+  if (interactingUserHasApproverRole(interaction)) {
+    if (interaction.customId === 'approve') handleApproveClick(interaction);
+
+    if (interaction.customId === 'ban') handleBanClick(interaction);
   }
+}
 
-  if(interaction.isButton()) {
-    if (interaction.member.roles.cache.has(mapLogChannelIdToApproverRoleId(interaction.channelId))) {
-      if (interaction.customId === 'approve') {
-        const role = interaction.member.guild.roles.cache.get(mapLogChannelIdToApprovedRoleId(interaction.channelId));
-        const member = interaction.message.mentions.members.first();
+function interactingUserHasApproverRole(interaction) {
+  return interaction.member.roles.cache.has(mapLogChannelIdToApproverRoleId(interaction.channelId));
+}
 
-        if (!role || !member) {
-          interaction.send({
-            content: `I ran in to an issue doing that, please do it manually`,
-          });
-          return
-        } else {
-          member.roles.add(role)
+function handleApproveClick(interaction) {
+  const role = interaction.member.guild.roles.cache.get(mapLogChannelIdToApprovedRoleId(interaction.channelId));
+  const member = interaction.message.mentions.members.first();
 
-          interaction.update({content: `${interaction.member.user} approved ${member.user} (${member.user.username}) to join the server`, components: []});
-        }
-      }
-      if (interaction.customId === 'ban') {
-        const member = interaction.message.mentions.members.first();
+  if (!role || !member) {
+    interaction.send({
+      content: `I ran in to an issue doing that, please do it manually`,
+    });
+    return
+  } else {
+    member.roles.add(role)
 
-        if (!member) {
-          interaction.send({
-            content: `I ran in to an issue doing that, please do it manually`,
-          });
-          return;
-        } else {
-          member.ban({reason: 'Banned for intro so either underage or obvious troll'});
-
-          interaction.update({content: `${interaction.member.user} banned ${member.user} (${member.user.username})`, components: []})
-        }
-      }
-    }
+    interaction.update({content: `${interaction.member.user} approved ${member.user} (${member.user.username}) to join the server`, components: []});
   }
-})
+}
+
+function handleBanClick(interaction) {
+  const member = interaction.message.mentions.members.first();
+
+  if (!member) {
+    interaction.send({
+      content: `I ran in to an issue doing that, please do it manually`,
+    });
+    return;
+  } else {
+    member.ban({reason: 'Banned for intro so either underage or obvious troll'});
+
+    interaction.update({content: `${interaction.member.user} banned ${member.user} (${member.user.username})`, components: []})
+  }
+}
+
+// ############################
+// Respond to user interactions
+//#############################
+
+client.on('interactionCreate', async (interaction) => {
+  if(interaction.commandName === 'intro') await interaction.showModal(getIntroModal());
+
+  if(interaction.isModalSubmit()) await handleModalSubmit(interaction);
+
+  if(interaction.isButton()) handleButtonClick(interaction);
+});
