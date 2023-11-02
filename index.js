@@ -82,7 +82,7 @@ function getFirstLine(user, name) {
       return `Everyone join me in welcoming ${user} (A.K.A ${name}) to The Gayborhood!!`;
     case 6:
     case 7:
-      return `Gayborhood Association is proud to present ${user} (A.K.A ${name}) as the newest member on the block`;
+      return `Gayborhood Association is proud to present ${user} (A.K.A ${name}) as the newest member on the block.`;
     case 8:
       return `The Gayborhood is just taking in anybody these days.... say hi to ${user} aka ${name}.`;
     case 9:
