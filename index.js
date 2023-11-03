@@ -79,18 +79,18 @@ function getFirstLine(user, name) {
     case 3:
     case 4:
     case 5:
-      return `Everyone join me in welcoming ${user} (A.K.A ${name}) to The Gayborhood!!`;
+      return `Everyone join me in welcoming **${user}** (A.K.A **${name}**) to The Gayborhood!!`;
     case 6:
     case 7:
-      return `Gayborhood Association is proud to present ${user} (A.K.A ${name}) as the newest member on the block.`;
+      return `Gayborhood Association is proud to present **${user}** (A.K.A **${name}**) as the newest member on the block.`;
     case 8:
-      return `The Gayborhood is just taking in anybody these days.... say hi to ${user} aka ${name}.`;
+      return `The Gayborhood is just taking in anybody these days.... say hi to **${user}** aka **${name}**.`;
     case 9:
-      return `The Gayborhood had a ${user} sized hole and they've decided to fill it. Thank you for filling our hole ${name}!`;
+      return `The Gayborhood had a **${user}** sized hole and they've decided to fill it. Thank you for filling our hole **${name}**!`;
     case 10:
-      return `uwu the Gayborhood just got a bit more kawaii ^-^, someone joined and its a cutie patootie called senpai ${user} (but u bakas can call them ${name}).`;
+      return `uwu the Gayborhood just got a bit more kawaii ^-^, someone joined and its a cutie patootie called senpai **${user}** (but u bakas can call them **${name}**).`;
     default:
-      return `Everyone join me in welcoming ${user} (A.K.A ${name}) to The Gayborhood!!`;
+      return `Everyone join me in welcoming **${user}** (A.K.A **${name}**) to The Gayborhood!!`;
   }
 }
 
@@ -102,29 +102,29 @@ function getSecondLine(name, age, location) {
     case 4:
     case 5:
     case 6:
-      return `${name} is ${age} years old and is from ${location}.`;
+      return `**${name}** is **${age}** years old and is from **${location}**.`;
     case 7:
       if (!parseInt(age)) {
         break;
       }
       if (parseInt(age) < 30) {
-        return `This widdle bubba has been growing for ${age} years into a big stwong independent pewson. The stalk they were born from is in ${location}.`;
+        return `This widdle bubba has been growing for **${age}** years into a big stwong independent pewson. The stalk they were born from is in **${location}**.`;
       }
-      return `Contrary to popular belief, ${name} is actually ${age} years old! The air quality in ${location} must be great for them to look so good.`;
+      return `Contrary to popular belief, **${name}** is actually **${age}** years old! The air quality in **${location}** must be great for them to look so good.`;
     case 8:
-      return `Seasoned to perfection, ${name} is ${age} years old! Seasoned with that good ol' ${location} seasoning, so you know its good.`;
+      return `Seasoned to perfection, **${name}** is **${age}** years old! Seasoned with that good ol' **${location}** seasoning, so you know its good.`;
     case 9:
       if (!parseInt(age)) {
         break;
       }
       if (parseInt(age) < 30) {
-        return `All the way from ${location} this undisputed baddie has been a reigning WWE champ for ${age} years and counting.`;
+        return `All the way from **${location}** this undisputed baddie has been a reigning WWE champ for **${age}** years and counting.`;
       }
-      return `Though they look much younger, ${name} is actually ${age} years old! Must be something in the water over there in ${location}.`;
+      return `Though they look much younger, **${name}** is actually **${age}** years old! Must be something in the water over there in **${location}**.`;
     case 10:
-      return `${name} has been a certified bad bitch for ${age} years and was voted the baddest bitch in ${location} 3 years in a row.`;
+      return `**${name}** has been a certified bad bitch for **${age}** years and was voted the baddest bitch in **${location}** 3 years in a row.`;
     }
-  return `${name} is ${age} years old and is from ${location}.`;
+  return `**${name}** is **${age}** years old and is from **${location}**.`;
 }
 
 function getFinalLine(name, hobbies) {
@@ -135,17 +135,17 @@ function getFinalLine(name, hobbies) {
     case 4:
     case 5:
     case 6:
-      return `${name}s hobbies and interests include: ${hobbies}`;
+      return `**${name}s** hobbies and interests include: **${hobbies}**`;
     case 7:
-      return `Besides sniffing the seats on public transport, ${name}s hobbies and interests include: ${hobbies}`;
+      return `Besides sniffing the seats on public transport, **${name}s** hobbies and interests include: **${hobbies}**`;
     case 8:
-      return `When they're not saving kittens from trees, ${name} likes: ${hobbies}`;
+      return `When they're not saving kittens from trees, **${name}** likes: **${hobbies}**`;
     case 9:
-      return `Besides eating eating beans in the movie theater, ${name}s hobbies and interests include: ${hobbies}`
+      return `Besides eating eating beans in the movie theater, **${name}s** hobbies and interests include: **${hobbies}**`
     case 10:
-      return `When they're not setting fire to orphanages, ${name} likes: ${hobbies}`;
+      return `When they're not setting fire to orphanages, **${name}** likes: **${hobbies}**`;
     default:
-      return `${name}s hobbies and interests include: ${hobbies}`;
+      return `**${name}s** hobbies and interests include: **${hobbies}**`;
   }
 }
 
