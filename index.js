@@ -291,7 +291,7 @@ function getIntroModal() {
 
   const hobbiesInput = new TextInputBuilder()
     .setCustomId('hobbiesInput')
-    .setLabel("What are some of your hobbies and interests? Please keep it wholesome, this is a mostly SFW space!")
+    .setLabel("Hobbies/Interests? Keep it wholesome please!")
     .setMaxLength(200)
     .setMinLength(20)
     .setPlaceholder('Enter some text!')
