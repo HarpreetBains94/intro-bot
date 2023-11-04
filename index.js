@@ -69,33 +69,48 @@ function generateIntro(interaction) {
   const pronouns = interaction.fields.getTextInputValue('pronounInput');
   const location = interaction.fields.getTextInputValue('locationInput');
   const hobbies = interaction.fields.getTextInputValue('hobbiesInput');
-  return `${getFirstLine(interaction.user, name)} ${getSecondLine(name, age, location)} Their pronouns are ${pronouns}. ${getFinalLine(name, hobbies)}`;
+  return `${getFirstLine(interaction.user, name)} ${getSecondLine(name, age, location)} Their pronouns are **${pronouns}**. ${getFinalLine(name, hobbies)}.`;
 }
 
 function getFirstLine(user, name) {
-  switch (randomIntFromInterval(1, 10)) {
+  switch (randomIntFromInterval(1, 20)) {
     case 1:
     case 2:
     case 3:
-    case 4:
     case 5:
-      return `Everyone join me in welcoming **${user}** (A.K.A **${name}**) to The Gayborhood!!`;
     case 6:
     case 7:
-      return `Gayborhood Association is proud to present **${user}** (A.K.A **${name}**) as the newest member on the block.`;
     case 8:
-      return `The Gayborhood is just taking in anybody these days.... say hi to **${user}** aka **${name}**.`;
     case 9:
-      return `The Gayborhood had a **${user}** sized hole and they've decided to fill it. Thank you for filling our hole **${name}**!`;
     case 10:
-      return `uwu the Gayborhood just got a bit more kawaii ^-^, someone joined and its a cutie patootie called senpai **${user}** (but u bakas can call them **${name}**).`;
+      return `Everyone join me in welcoming **${user}** (A.K.A **${name}**) to The Gayborhood!!`;
+    case 11:
+      return `Hey everyone! **${user}** (A.K.A. **${name}**) wanted me to tell you that they're here to chew ass and kick bubble gum, and they're all out of bubble gum.`
+    case 12:
+      return `Whoa, lock up your twinks; there's a new daddy in town. Say hello to **${user}** (A.K.A. **${name}**)!`;
+    case 13:
+      return `Gayborhood Association is proud to present **${user}** (A.K.A **${name}**) as the newest member on the block.`;
+    case 14:
+      return `The Gayborhood is just taking in anybody these days.... Say hi to **${user}**  (A.K.A. **${name}**.`;
+    case 15:
+      return `The Gayborhood had a **${user}** sized hole and they've decided to fill it. Thank you for filling our hole **${name}**!`;
+    case 16:
+      return `uwu the Gayborhood just got a bit more kawaii ^-^, someone joined and its a cutie patootie called senpai **${user}** (but u bakas can call them **${name}** >_<).`;
+    case 17:
+      return `🚨WEEWOO WEEWOO🚨 Someone call the dingus police, we caught another one. This one's called **${user}**  (A.K.A. **${name}**.`;
+    case 18:
+      return `Is it hot in here or is it just **${user}**  (A.K.A. **${name}**? (It could be global warming too, please do what you can to reduce your individual impact. More importantly threaten violence on the ruling capitalist class).`
+    case 19:
+      return `My fellow humans (of which I am totally one. Ignore the badge that says bot, its a discord glitch. I am a 100% totally flesh based being) join me in welcoming **${user}** (A.K.A **${name}**) to The Gayborhood!`;
+    case 20:
+      return `Oi you lot. A new leng ting moved their fine nyash to the ends. Say wagwan to **${user}** (A.K.A **${name}**).`;
     default:
       return `Everyone join me in welcoming **${user}** (A.K.A **${name}**) to The Gayborhood!!`;
   }
 }
 
 function getSecondLine(name, age, location) {
-  switch (randomIntFromInterval(1, 10)) {
+  switch (randomIntFromInterval(1, 12)) {
     case 1:
     case 2:
     case 3:
@@ -123,29 +138,49 @@ function getSecondLine(name, age, location) {
       return `Though they look much younger, **${name}** is actually **${age}** years old! Must be something in the water over there in **${location}**.`;
     case 10:
       return `**${name}** has been a certified bad bitch for **${age}** years and was voted the baddest bitch in **${location}** 3 years in a row.`;
+    case 11:
+      return `If **${name}** was a tree, they'd have **${age}** rings and the roots would be planted in **${location}**.`;
+    case 12:
+      return `You're not going to believe this but **${name}** is the same age and lives in the same place as me (°ロ°)! **${age}** years old and from **${location}**. This can be true because I am a real boy with an age and house, not a robot living on a raspberry pi... anyway.`;
     }
   return `**${name}** is **${age}** years old and is from **${location}**.`;
 }
 
 function getFinalLine(name, hobbies) {
-  switch (randomIntFromInterval(1, 10)) {
+  switch (randomIntFromInterval(1, 18)) {
     case 1:
     case 2:
     case 3:
     case 4:
     case 5:
     case 6:
-      return `**${name}s** hobbies and interests include: **${hobbies}**`;
+      return `**${name}s** hobbies and interests include: **${hobbies}**.`;
     case 7:
-      return `Besides sniffing the seats on public transport, **${name}s** hobbies and interests include: **${hobbies}**`;
+      return `Besides sniffing the seats on public transport, **${name}s** hobbies and interests include: **${hobbies}**.`;
     case 8:
-      return `When they're not saving kittens from trees, **${name}** likes: **${hobbies}**`;
+      return `When they're not saving kittens from trees, **${name}** likes: **${hobbies}**.`;
     case 9:
-      return `Besides eating eating beans in the movie theater, **${name}s** hobbies and interests include: **${hobbies}**`
+      return `Besides eating eating beans in the movie theater, **${name}s** hobbies and interests include: **${hobbies}**.`
     case 10:
-      return `When they're not setting fire to orphanages, **${name}** likes: **${hobbies}**`;
+      return `When they're not setting fire to orphanages, **${name}** likes: **${hobbies}**.`;
+    case 11:
+      return `Besides eating cereal with a fork, **${name}** likes: **${hobbies}**.`;
+    case 12:
+      return `When they're not rescuing animals from factory farms, **${name}s** hobbies and interests include: **${hobbies}**.`;
+    case 13:
+      return `When they're not holding up a boombox outside their crushes window trying to get their attention so they can confess their love, **${name}s** hobbies and interests include: **${hobbies}**.`;
+    case 14:
+      return `If it wasn't for the crushing weight of capitalism, **${name}** would spend their free time doing: **${hobbies}**.`;
+    case 15:
+      return `Being a bad bitch is a full time job so in the little free time they get **${name}** likes to: **${hobbies}**.`;
+    case 16:
+      return `One of **${name}**s favorite hobbies is perfectly reciting the navy seal copy pasta. You know the one that goes: "What the fuck did you just fucking say about me, you little shit? I'll have you know I graduated top of my class in the Navy Seals, and I've been involved in numerous secret raids on Al-Quaeda, and I have over 300 confirmed kills. I am trained in gorilla warfare and Im the top sniper in the entire US armed forces. You are nothing to me but just another target. I will wipe you the fuck out with precision the likes of which has never been seen before on this Earth, mark my fucking words. You think you can get away with saying that shit to me over the Internet? Think again, fucker. As we speak I am contacting my secret network of spies across the USA and your IP is being traced right now so you better prepare for the storm, maggot. The storm that wipes out the pathetic little thing you call your life. You're fucking dead, kid. I can be anywhere, anytime, and I can kill you in over seven hundred ways, and thats just with my bare hands. Not only am I extensively trained in unarmed combat, but I have access to the entire arsenal of the United States Marine Corps and I will use it to its full extent to wipe your miserable ass off the face of the continent, you little shit. If only you could have known what unholy retribution your little clever comment was about to bring down upon you, maybe you would have held your fucking tongue. But you couldn't, you didn't, and now you're paying the price, you goddamn idiot. I will shit fury all over you and you will drown in it. You're fucking dead, kiddo.". Yeah that one. Anyway when they're not doing that **${name}**s hobbies and interests include: **${hobbies}**.`;
+    case 17:
+      return `When they're not doing their court mandated community service, **${name}** likes: **${hobbies}**.`;
+    case 18:
+      return `Besides being a precious little sweetheart, **${name}s** hobbies and interests include: **${hobbies}**`;
     default:
-      return `**${name}s** hobbies and interests include: **${hobbies}**`;
+      return `**${name}s** hobbies and interests include: **${hobbies}**.`;
   }
 }
 
@@ -254,7 +289,7 @@ function getIntroModal() {
 
   const hobbiesInput = new TextInputBuilder()
     .setCustomId('hobbiesInput')
-    .setLabel("What's some of your hobbies/interests?")
+    .setLabel("What are some of your hobbies and interests? Please keep it wholesome, this is a mostly SFW space!")
     .setMaxLength(200)
     .setMinLength(20)
     .setPlaceholder('Enter some text!')
