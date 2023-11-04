@@ -1,4 +1,4 @@
-const { Client, IntentsBitField, Routes, REST, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { Client, IntentsBitField, Routes, REST, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, AttachmentBuilder } = require('discord.js');
 
 // ############################
 // Initial Setup
@@ -148,6 +148,13 @@ function getSecondLine(name, age, location) {
   return `**${name}** is **${age}** years old and is from **${location}**.`;
 }
 
+function getPluralUsername(name) {
+  if (name.split('').pop().toLocaleLowerCase() === 's') {
+    return `**${name}'**`;
+  }
+  return `**${name}s**`;
+}
+
 function getFinalLine(name, hobbies) {
   switch (randomIntFromInterval(1, 18)) {
     case 1:
@@ -156,33 +163,33 @@ function getFinalLine(name, hobbies) {
     case 4:
     case 5:
     case 6:
-      return `**${name}s** hobbies and interests include: **${hobbies}**.`;
+      return `${getPluralUsername(name)} hobbies and interests include: **${hobbies}**.`;
     case 7:
-      return `Besides sniffing the seats on public transport, **${name}s** hobbies and interests include: **${hobbies}**.`;
+      return `Besides sniffing the seats on public transport, ${getPluralUsername(name)} hobbies and interests include: **${hobbies}**.`;
     case 8:
       return `When they're not saving kittens from trees, **${name}** likes: **${hobbies}**.`;
     case 9:
-      return `Besides eating eating beans in the movie theater, **${name}s** hobbies and interests include: **${hobbies}**.`
+      return `Besides eating eating beans in the movie theater, ${getPluralUsername(name)} hobbies and interests include: **${hobbies}**.`
     case 10:
       return `When they're not setting fire to orphanages, **${name}** likes: **${hobbies}**.`;
     case 11:
       return `Besides eating cereal with a fork, **${name}** likes: **${hobbies}**.`;
     case 12:
-      return `When they're not rescuing animals from factory farms, **${name}s** hobbies and interests include: **${hobbies}**.`;
+      return `When they're not rescuing animals from factory farms, ${getPluralUsername(name)} hobbies and interests include: **${hobbies}**.`;
     case 13:
-      return `When they're not holding up a boombox outside their crushes window trying to get their attention so they can confess their love, **${name}s** hobbies and interests include: **${hobbies}**.`;
+      return `When they're not holding up a boombox outside their crushes window trying to get their attention so they can confess their love, ${getPluralUsername(name)} hobbies and interests include: **${hobbies}**.`;
     case 14:
       return `If it wasn't for the crushing weight of capitalism, **${name}** would spend their free time doing: **${hobbies}**.`;
     case 15:
       return `Being a bad bitch is a full time job so in the little free time they get **${name}** likes to: **${hobbies}**.`;
     case 16:
-      return `One of **${name}**s favorite hobbies is perfectly reciting the navy seal copy pasta. You know the one that goes: "What the fuck did you just fucking say about me, you little shit? I'll have you know I graduated top of my class in the Navy Seals, and I've been involved in numerous secret raids on Al-Quaeda, and I have over 300 confirmed kills. I am trained in gorilla warfare and Im the top sniper in the entire US armed forces. You are nothing to me but just another target. I will wipe you the fuck out with precision the likes of which has never been seen before on this Earth, mark my fucking words. You think you can get away with saying that shit to me over the Internet? Think again, fucker. As we speak I am contacting my secret network of spies across the USA and your IP is being traced right now so you better prepare for the storm, maggot. The storm that wipes out the pathetic little thing you call your life. You're fucking dead, kid. I can be anywhere, anytime, and I can kill you in over seven hundred ways, and thats just with my bare hands. Not only am I extensively trained in unarmed combat, but I have access to the entire arsenal of the United States Marine Corps and I will use it to its full extent to wipe your miserable ass off the face of the continent, you little shit. If only you could have known what unholy retribution your little clever comment was about to bring down upon you, maybe you would have held your fucking tongue. But you couldn't, you didn't, and now you're paying the price, you goddamn idiot. I will shit fury all over you and you will drown in it. You're fucking dead, kiddo.". Yeah that one. Anyway when they're not doing that **${name}**s hobbies and interests include: **${hobbies}**.`;
+      return `One of ${getPluralUsername(name)} favorite hobbies is perfectly reciting the navy seal copy pasta. You know the one that goes: "What the fuck did you just fucking say about me, you little shit? I'll have you know I graduated top of my class in the Navy Seals, and I've been involved in numerous secret raids on Al-Quaeda, and I have over 300 confirmed kills. I am trained in gorilla warfare and Im the top sniper in the entire US armed forces. You are nothing to me but just another target. I will wipe you the fuck out with precision the likes of which has never been seen before on this Earth, mark my fucking words. You think you can get away with saying that shit to me over the Internet? Think again, fucker. As we speak I am contacting my secret network of spies across the USA and your IP is being traced right now so you better prepare for the storm, maggot. The storm that wipes out the pathetic little thing you call your life. You're fucking dead, kid. I can be anywhere, anytime, and I can kill you in over seven hundred ways, and thats just with my bare hands. Not only am I extensively trained in unarmed combat, but I have access to the entire arsenal of the United States Marine Corps and I will use it to its full extent to wipe your miserable ass off the face of the continent, you little shit. If only you could have known what unholy retribution your little clever comment was about to bring down upon you, maybe you would have held your fucking tongue. But you couldn't, you didn't, and now you're paying the price, you goddamn idiot. I will shit fury all over you and you will drown in it. You're fucking dead, kiddo.". Yeah that one. Anyway when they're not doing that ${getPluralUsername(name)} hobbies and interests include: **${hobbies}**.`;
     case 17:
       return `When they're not doing their court mandated community service, **${name}** likes: **${hobbies}**.`;
     case 18:
-      return `Besides being a precious little sweetheart, **${name}s** hobbies and interests include: **${hobbies}**`;
+      return `Besides being a precious little sweetheart, ${getPluralUsername(name)} hobbies and interests include: **${hobbies}**`;
     default:
-      return `**${name}s** hobbies and interests include: **${hobbies}**.`;
+      return `${getPluralUsername(name)} hobbies and interests include: **${hobbies}**.`;
   }
 }
 
@@ -406,6 +413,32 @@ function handleBanClick(interaction) {
   }
 }
 
+async function doStickyStuff(channel) {
+  var lastChannelMessage = null;
+  await channel.messages.fetch({ limit: 1 }).then(messages => {
+    lastChannelMessage = messages.first();
+  })
+  if (!lastChannelMessage || (!!lastChannelMessage && lastChannelMessage.author.id !== client.user.id)) {
+    const otherMessagesFromBot = [];
+    await channel.messages.fetch({ limit: 99 }).then(messages => {
+      messages.forEach(message => {
+        if (message.author.id === client.user.id) {
+          otherMessagesFromBot.push(message);
+        }
+      })
+    });
+    await channel.bulkDelete(otherMessagesFromBot);
+    const file = new AttachmentBuilder('./example.png');
+    const embed = new EmbedBuilder()
+      .setColor(0x0099FF)
+      .setTitle('How to Gain Entry to the Server')
+      .setDescription("To get started in this server first you'll need to generate an intro.\n\nTo do this simply type **/intro** and click on the command that pops up (highlighted in the image below).\n\nOnce you've made your intro please wait while a staff member will review and grant you access.")
+      .setImage('attachment://example.png')
+      .setTimestamp()
+    channel.send({ embeds: [embed], files: [file] });
+  }
+}
+
 // ############################
 // Respond to user interactions
 //#############################
@@ -417,3 +450,10 @@ client.on('interactionCreate', async (interaction) => {
 
   if(interaction.isButton()) handleButtonClick(interaction);
 });
+
+setInterval(async () => {
+  const devChannel = client.channels.cache.get(DEV_SERVER_START_CHANNEL_ID);
+  const prodChannel = client.channels.cache.get(PROD_SERVER_START_CHANNEL_ID);
+  await doStickyStuff(devChannel);
+  await doStickyStuff(prodChannel);
+}, 30000);
