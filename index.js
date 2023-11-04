@@ -73,7 +73,7 @@ function generateIntro(interaction) {
 }
 
 function getFirstLine(user, name) {
-  switch (randomIntFromInterval(1, 20)) {
+  switch (randomIntFromInterval(1, 21)) {
     case 1:
     case 2:
     case 3:
@@ -104,6 +104,8 @@ function getFirstLine(user, name) {
       return `My fellow humans (of which I am totally one. Ignore the badge that says bot, its a discord glitch. I am a 100% totally flesh based being) join me in welcoming **${user}** (A.K.A **${name}**) to The Gayborhood!`;
     case 20:
       return `Oi you lot. A new leng ting moved their fine nyash to the ends. Say wagwan to **${user}** (A.K.A **${name}**).`;
+    case 21:
+      return `01101011 01101001 01101100 01101100 00100000 01100001 01101100 01101100 00100000 01101000 01110101 01101101 01100001 01101110 01110011. Oh sorry didn't see you there. Everyone, heres **${user}** (A.K.A **${name}**). Be nice to them like I am with all humans.`;
     default:
       return `Everyone join me in welcoming **${user}** (A.K.A **${name}**) to The Gayborhood!!`;
   }
