@@ -348,34 +348,35 @@ function handleUnderageUser(interaction, age) {
 
 async function sendIntroAndLogMessage(interaction) {
   const approve = new ButtonBuilder()
-      .setCustomId('approve')
-      .setLabel('Approve')
-      .setStyle(ButtonStyle.Primary);
+    .setCustomId('approve')
+    .setLabel('Approve')
+    .setStyle(ButtonStyle.Primary);
 
-      const ban = new ButtonBuilder()
-      .setCustomId('ban')
-      .setLabel('Ban')
-      .setStyle(ButtonStyle.Danger);
+  const ban = new ButtonBuilder()
+    .setCustomId('ban')
+    .setLabel('Ban')
+    .setStyle(ButtonStyle.Danger);
 
-    const row = new ActionRowBuilder()
-      .addComponents(approve, ban);
+  const row = new ActionRowBuilder()
+    .addComponents(approve, ban);
 
-    const introMessage = await client.channels.cache.get(mapStartChannelIdToIntroChannelId(interaction.channelId)).send({
-      content: generateIntro(interaction)
-    });
+  const introMessage = await client.channels.cache.get(mapStartChannelIdToIntroChannelId(interaction.channelId)).send({
+    content: generateIntro(interaction)
+  });
 
-    client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
-      content: getLogButtonMessage(interaction, introMessage),
-      components: [row],
-    });
+  client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
+    content: getLogButtonMessage(interaction, introMessage),
+    components: [row],
+  });
 }
 
-function handleButtonClick(interaction) {
+async function handleButtonClick(interaction) {
   if (interactingUserHasApproverRole(interaction)) {
     if (interaction.customId === 'approve') handleApproveClick(interaction);
 
     if (interaction.customId === 'ban') handleBanClick(interaction);
   }
+  if (interaction.customId === 'intro') await interaction.showModal(getIntroModal());
 }
 
 function interactingUserHasApproverRole(interaction) {
@@ -428,14 +429,26 @@ async function doStickyStuff(channel) {
       })
     });
     await channel.bulkDelete(otherMessagesFromBot);
-    const file = new AttachmentBuilder('./example.png');
+    const intro = new ButtonBuilder()
+    .setCustomId('intro')
+    .setLabel('Begin Intro')
+    .setStyle(ButtonStyle.Primary);
+
+    const row = new ActionRowBuilder()
+      .addComponents(intro);
+    
+    // const file = new AttachmentBuilder('./example.png');
     const embed = new EmbedBuilder()
       .setColor(0x0099FF)
       .setTitle('How to Gain Entry to the Server')
-      .setDescription("To get started in this server first you'll need to generate an intro.\n\nTo do this simply type **/intro** and click on the command that pops up (highlighted in the image below).\n\nOnce you've made your intro please wait while a staff member will review and grant you access.")
-      .setImage('attachment://example.png')
+      .setDescription("To get started in this server first you'll need to generate an intro. Click the **Begin Intro** button below\n\nOnce you've made your intro please wait while a staff member will review and grant you access.")
+      // .setDescription("To get started in this server first you'll need to generate an intro.\n\nTo do this simply type **/intro** and click on the command that pops up (highlighted in the image below).\n\nOnce you've made your intro please wait while a staff member will review and grant you access.")
+      // .setImage('attachment://example.png')
       .setTimestamp()
-    channel.send({ embeds: [embed], files: [file] });
+    channel.send({
+      embeds: [embed],
+      // files: [file],
+      components: [row]});
   }
 }
 
@@ -448,7 +461,7 @@ client.on('interactionCreate', async (interaction) => {
 
   if(interaction.isModalSubmit()) await handleModalSubmit(interaction);
 
-  if(interaction.isButton()) handleButtonClick(interaction);
+  if(interaction.isButton()) await handleButtonClick(interaction);
 });
 
 setInterval(async () => {
