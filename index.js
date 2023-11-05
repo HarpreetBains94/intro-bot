@@ -245,12 +245,12 @@ function mapStartChannelIdToLogChannelId(id) {
   }
 }
 
-function getLogButtonMessage(interaction, introMessage) {
+function getLogButtonMessage(introMessage) {
   const user = introMessage.mentions.members.first().user;
-  const message = `New Intro: ${introMessage.url} from ${user} (${user.username})`
+  let message = `New Intro: ${introMessage.url} from ${user} (${user.username})`
   const accountAge = user.createdAt;
   if ((new Date().getTime() - accountAge.getTime()) < 604800000) {
-    message + ` Warning, the users account was created recently (${accountAge.toLocaleDateString} - ${accountAge.toLocaleTimeString()})`
+    message = message + ` Warning, the users account was created recently (${accountAge.toLocaleDateString} - ${accountAge.toLocaleTimeString()})`
   }
   return message;
 }
@@ -351,6 +351,11 @@ async function sendIntroAndLogMessage(interaction) {
     .setCustomId('approve')
     .setLabel('Approve')
     .setStyle(ButtonStyle.Primary);
+  
+  const kick = new ButtonBuilder()
+    .setCustomId('kick')
+    .setLabel('Kick')
+    .setStyle(ButtonStyle.Danger);
 
   const ban = new ButtonBuilder()
     .setCustomId('ban')
@@ -358,14 +363,14 @@ async function sendIntroAndLogMessage(interaction) {
     .setStyle(ButtonStyle.Danger);
 
   const row = new ActionRowBuilder()
-    .addComponents(approve, ban);
+    .addComponents(approve, kick, ban);
 
   const introMessage = await client.channels.cache.get(mapStartChannelIdToIntroChannelId(interaction.channelId)).send({
     content: generateIntro(interaction)
   });
 
   client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
-    content: getLogButtonMessage(interaction, introMessage),
+    content: getLogButtonMessage(introMessage),
     components: [row],
   });
 }
@@ -373,7 +378,9 @@ async function sendIntroAndLogMessage(interaction) {
 async function handleButtonClick(interaction) {
   if (interactingUserHasApproverRole(interaction)) {
     if (interaction.customId === 'approve') handleApproveClick(interaction);
-
+    
+    if (interaction.customId === 'kick') handleKickClick(interaction);
+    
     if (interaction.customId === 'ban') handleBanClick(interaction);
   }
   if (interaction.customId === 'intro') await interaction.showModal(getIntroModal());
@@ -411,6 +418,21 @@ function handleBanClick(interaction) {
     member.ban({reason: 'Banned for intro so either underage or obvious troll'});
 
     interaction.update({content: `${interaction.member.user} banned ${member.user} (${member.user.username})`, components: []})
+  }
+}
+
+function handleKickClick(interaction) {
+  const member = interaction.message.mentions.members.first();
+
+  if (!member) {
+    interaction.send({
+      content: `I ran in to an issue doing that, please do it manually`,
+    });
+    return;
+  } else {
+    member.kick(['Kicked for intro so either underage or obvious troll']);
+
+    interaction.update({content: `${interaction.member.user} kicked ${member.user} (${member.user.username})`, components: []})
   }
 }
 
