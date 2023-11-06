@@ -36,6 +36,12 @@ const rest = new REST({version: '10'}).setToken(DISCORD_DEV_TOKEN);
 
 client.once('ready', (c) => {
     console.log('${c.user.tag} Loaded!');
+    setInterval(async () => {
+      const devChannel = client.channels.cache.get(DEV_SERVER_START_CHANNEL_ID);
+      const prodChannel = client.channels.cache.get(PROD_SERVER_START_CHANNEL_ID);
+      await doStickyStuff(devChannel);
+      await doStickyStuff(prodChannel);
+    }, 30000);
 });
 
 async function setupCommands() {
@@ -69,7 +75,7 @@ function generateIntro(interaction) {
   const pronouns = interaction.fields.getTextInputValue('pronounInput');
   const location = interaction.fields.getTextInputValue('locationInput');
   const hobbies = interaction.fields.getTextInputValue('hobbiesInput');
-  return `${getNewLine()}\n${getFirstLine(interaction.user, name)} ${getSecondLine(name, age, location)} Their pronouns are **${pronouns}**. ${getFinalLine(name, hobbies)}.\n\n`;
+  return `${getNewLine()}\n${getFirstLine(interaction.user, name)} ${getSecondLine(name, age, location)} Their pronouns are **${pronouns}**. ${getFinalLine(name, hobbies)}.`;
 }
 
 function getNewLine() {
@@ -489,10 +495,3 @@ client.on('interactionCreate', async (interaction) => {
 
   if(interaction.isButton()) await handleButtonClick(interaction);
 });
-
-setInterval(async () => {
-  const devChannel = client.channels.cache.get(DEV_SERVER_START_CHANNEL_ID);
-  const prodChannel = client.channels.cache.get(PROD_SERVER_START_CHANNEL_ID);
-  await doStickyStuff(devChannel);
-  await doStickyStuff(prodChannel);
-}, 30000);
