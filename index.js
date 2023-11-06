@@ -69,7 +69,7 @@ function generateIntro(interaction) {
   const pronouns = interaction.fields.getTextInputValue('pronounInput');
   const location = interaction.fields.getTextInputValue('locationInput');
   const hobbies = interaction.fields.getTextInputValue('hobbiesInput');
-  return `${getNewLine()}\n${getFirstLine(interaction.user, name)} ${getSecondLine(name, age, location)} Their pronouns are **${pronouns}**. ${getFinalLine(name, hobbies)}.`;
+  return `${getNewLine()}\n${getFirstLine(interaction.user, name)} ${getSecondLine(name, age, location)} Their pronouns are **${pronouns}**. ${getFinalLine(name, hobbies)}.\n\n`;
 }
 
 function getNewLine() {
