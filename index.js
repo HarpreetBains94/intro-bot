@@ -472,7 +472,7 @@ async function doStickyStuff(channel) {
     const embed = new EmbedBuilder()
       .setColor(0x0099FF)
       .setTitle('How to Gain Entry to the Server')
-      .setDescription("To get started in this server first you'll need to generate an intro. Click the **Begin Intro** button below.\n\nOnce you've made your intro please wait for a staff member to review and grant you access.\nPlease note this is NOT a porn server.")
+      .setDescription("To get started in this server first you'll need to generate an intro. Click the **Begin Intro** button below.\n\nOnce you've made your intro please wait for a staff member to review and grant you access.\n\n__PLEASE NOTE THIS IS **NOT** A PORN SERVER__")
       .setTimestamp()
     channel.send({
       embeds: [embed],
