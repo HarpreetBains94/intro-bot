@@ -75,7 +75,7 @@ function generateIntro(interaction) {
   const pronouns = interaction.fields.getTextInputValue('pronounInput');
   const location = interaction.fields.getTextInputValue('locationInput');
   const hobbies = interaction.fields.getTextInputValue('hobbiesInput');
-  return `${getNewLine()}\n${getFirstLine(interaction.user, name)} ${getSecondLine(name, age, location)} Their pronouns are **${pronouns}**. ${getFinalLine(name, hobbies)}.`;
+  return `${getNewLine()}\n${getFirstLine(interaction.user, name)} ${getSecondLine(name, age, location)} Their pronouns are **${pronouns}**. ${getFinalLine(name, hobbies)}`;
 }
 
 function getNewLine() {
@@ -242,6 +242,32 @@ function mapLogChannelIdToApprovedRoleId(id) {
   }
 }
 
+function mapLogChannelIdToStartChannelId(id) {
+  switch (id) {
+    case MY_SERVER_LOG_CHANNEL_ID:
+      return MY_SERVER_START_CHANNEL_ID;
+    case DEV_SERVER_LOG_CHANNEL_ID:
+      return DEV_SERVER_START_CHANNEL_ID;
+    case PROD_SERVER_LOG_CHANNEL_ID:
+      return PROD_SERVER_START_CHANNEL_ID;
+    default:
+      return MY_SERVER_START_CHANNEL_ID;
+  }
+}
+
+function mapLogChannelIdToIntroChannelId(id) {
+  switch (id) {
+    case MY_SERVER_LOG_CHANNEL_ID:
+      return MY_SERVER_INTRO_CHANNEL_ID;
+    case DEV_SERVER_LOG_CHANNEL_ID:
+      return DEV_SERVER_INTRO_CHANNEL_ID;
+    case PROD_SERVER_LOG_CHANNEL_ID:
+      return PROD_SERVER_INTRO_CHANNEL_ID;
+    default:
+      return MY_SERVER_START_CHANNEL_ID;
+  }
+}
+
 function mapStartChannelIdToLogChannelId(id) {
   switch (id) {
     case MY_SERVER_START_CHANNEL_ID:
@@ -326,11 +352,15 @@ function getIntroModal() {
   return modal;
 }
 
-async function handleModalSubmit(interaction) {
-  interaction.reply({
-    content: 'Generating your intro now! Server staff will review it and grant you entrance in to the server.',
-    ephemeral: true
-  })
+async function handleIntroModalSubmit(interaction) {
+  try {
+    await interaction.reply({
+      content: 'Generating your intro now! Server staff will review it and grant you entrance in to the server.',
+      ephemeral: true
+    })
+  } catch (err) {
+    console.log(err)
+  }
 
   age = parseInt(interaction.fields.getTextInputValue('ageInput'));
 
@@ -341,25 +371,99 @@ async function handleModalSubmit(interaction) {
   }
 }
 
-function handleUnderageUser(interaction, age) {
-  const ban = new ButtonBuilder()
-      .setCustomId('ban')
-      .setLabel('Ban')
-      .setStyle(ButtonStyle.Danger);
+async function handleRejectModalSubmit(interaction) {
+  const member = interaction.message.mentions.members.first();
+  const reason = interaction.fields.getTextInputValue('rejectionReason');
 
-    const row = new ActionRowBuilder()
-      .addComponents(ban);
-    
-    client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
-      content: `🚨👮<(Underage user detected. ${interaction.member.user} claims to be ${age} years old)🚨`,
-      components: [row],
-    });
+  let hasSucceeded = false;
+  let retries = 0;
+  if (!member) {
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await interaction.send({
+          content: `I ran in to an issue doing that, please do it manually`,
+        });
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
+    return
+  } else {
+    const introMessageLink = interaction.message.content.split(' ')[2];
+    deleteBadIntro(introMessageLink, client.channels.cache.get(mapLogChannelIdToIntroChannelId(interaction.channelId)));
+
+    hasSucceeded = false;
+    retries = 0;
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await interaction.update({content: `${interaction.member.user} rejected ${member.user} (${member.user.username}) to join the server`, components: []});
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
+
+    hasSucceeded = false;
+    retries = 0;
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await client.channels.cache.get(mapLogChannelIdToStartChannelId(interaction.channelId)).send({
+          content: `${member} your intro has been rejected for the following reason:\n\n"${reason}"\n\n Please try again.`
+        });
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
+  }
+}
+
+async function handleUnderageUser(interaction, age) {
+  const ban = new ButtonBuilder()
+    .setCustomId('ban')
+    .setLabel('Ban')
+    .setStyle(ButtonStyle.Danger);
+
+  const row = new ActionRowBuilder()
+    .addComponents(ban);
+  
+  let hasSucceeded = false;
+  let retries = 0;
+  while (!hasSucceeded && retries < 2) {
+    try {
+      await client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
+        content: `🚨👮<(Underage user detected. ${interaction.member.user} claims to be ${age} years old)🚨`,
+        components: [row],
+      });
+      hasSucceeded = true;
+    } catch (err) {
+      retries = retries + 1;
+      if (retries >= 2) {
+        console.log(err);
+      }
+    }
+  }
 }
 
 async function sendIntroAndLogMessage(interaction) {
   const approve = new ButtonBuilder()
     .setCustomId('approve')
     .setLabel('Approve')
+    .setStyle(ButtonStyle.Success);
+
+  const reject = new ButtonBuilder()
+    .setCustomId('reject')
+    .setLabel('Reject')
     .setStyle(ButtonStyle.Primary);
   
   const kick = new ButtonBuilder()
@@ -373,16 +477,47 @@ async function sendIntroAndLogMessage(interaction) {
     .setStyle(ButtonStyle.Danger);
 
   const row = new ActionRowBuilder()
-    .addComponents(approve, kick, ban);
+    .addComponents(approve, reject, kick, ban);
 
-  const introMessage = await client.channels.cache.get(mapStartChannelIdToIntroChannelId(interaction.channelId)).send({
-    content: generateIntro(interaction)
-  });
+  let introMessageContent = generateIntro(interaction);
 
-  client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
-    content: getLogButtonMessage(introMessage),
-    components: [row],
-  });
+  while (introMessageContent.split('').length > 1950) {
+    introMessageContent = generateIntro(interaction);
+  }
+
+  let introMessage;
+  let hasSucceeded = false;
+  let retries = 0;
+  while (!hasSucceeded && retries < 2) {
+    try {
+      introMessage = await client.channels.cache.get(mapStartChannelIdToIntroChannelId(interaction.channelId)).send({
+        content: introMessageContent
+      });
+      hasSucceeded = true;
+    } catch (err) {
+      retries = retries + 1;
+      if (retries >= 2) {
+        console.log(err);
+      }
+    }
+  }
+
+  hasSucceeded = false;
+  retries = 0;
+  while (!hasSucceeded && retries < 2) {
+    try {
+      client.channels.cache.get(mapStartChannelIdToLogChannelId(interaction.channelId)).send({
+        content: getLogButtonMessage(introMessage),
+        components: [row],
+      });
+      hasSucceeded = true;
+    } catch (err) {
+      retries = retries + 1;
+      if (retries >= 2) {
+        console.log(err);
+      }
+    }
+  }
 }
 
 async function handleButtonClick(interaction) {
@@ -392,91 +527,312 @@ async function handleButtonClick(interaction) {
     if (interaction.customId === 'kick') handleKickClick(interaction);
     
     if (interaction.customId === 'ban') handleBanClick(interaction);
+
+    if (interaction.customId === 'reject') handleRejectClick(interaction);
   }
-  if (interaction.customId === 'intro') await interaction.showModal(getIntroModal());
+  if (interaction.customId === 'intro') handleShowIntroModal(interaction);
 }
 
 function interactingUserHasApproverRole(interaction) {
   return interaction.member.roles.cache.has(mapLogChannelIdToApproverRoleId(interaction.channelId));
 }
 
-function handleApproveClick(interaction) {
+async function handleApproveClick(interaction) {
   const role = interaction.member.guild.roles.cache.get(mapLogChannelIdToApprovedRoleId(interaction.channelId));
   const member = interaction.message.mentions.members.first();
 
+  let hasSucceeded = false;
+  let retries = 0;
+
   if (!role || !member) {
-    interaction.send({
-      content: `I ran in to an issue doing that, please do it manually`,
-    });
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await interaction.send({
+          content: `I ran in to an issue doing that, please do it manually`,
+        });
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
     return
   } else {
-    member.roles.add(role)
+    hasSucceeded = false;
+    retries = 0;
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await member.roles.add(role);
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
 
-    interaction.update({content: `${interaction.member.user} approved ${member.user} (${member.user.username}) to join the server`, components: []});
+    hasSucceeded = false;
+    retries = 0;
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await interaction.update({content: `${interaction.member.user} approved ${member.user} (${member.user.username}) to join the server`, components: []});
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
   }
 }
 
-function handleBanClick(interaction) {
+async function handleRejectClick(interaction) {
   const member = interaction.message.mentions.members.first();
-
-  if (!member) {
-    interaction.send({
-      content: `I ran in to an issue doing that, please do it manually`,
-    });
-    return;
-  } else {
-    member.ban({reason: 'Banned for intro so either underage or obvious troll'});
-
-    interaction.update({content: `${interaction.member.user} banned ${member.user} (${member.user.username})`, components: []})
+  let hasSucceeded = false;
+  let retries = 0;
+  while (!hasSucceeded && retries < 2) {
+    try {
+      await interaction.showModal(getRejectModal(member));
+      hasSucceeded = true;
+    } catch (err) {
+      retries = retries + 1;
+      if (retries >= 2) {
+        console.log(err);
+      }
+    }
   }
 }
 
-function handleKickClick(interaction) {
+function getRejectModal(member) {
+  const modal = new ModalBuilder()
+    .setCustomId('rejectModal')
+    .setTitle(`Rejecting ${member.username}`);
+
+  const reason = new TextInputBuilder()
+    .setCustomId('rejectionReason')
+    .setLabel("Reason for rejection")
+    .setMaxLength(500)
+    .setMinLength(10)
+    .setPlaceholder('Enter a reason')
+    .setRequired(true)
+    .setStyle(TextInputStyle.Paragraph);
+
+  const firstActionRow = new ActionRowBuilder().addComponents(reason);
+
+  modal.addComponents(firstActionRow);
+
+  return modal;
+}
+
+async function handleBanClick(interaction) {
   const member = interaction.message.mentions.members.first();
 
+  let hasSucceeded = false;
+  let retries = 0;
+
   if (!member) {
-    interaction.send({
-      content: `I ran in to an issue doing that, please do it manually`,
-    });
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await interaction.send({
+          content: `I ran in to an issue doing that, please do it manually`,
+        });
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
     return;
   } else {
-    member.kick(['Kicked for intro so either underage or obvious troll']);
+    const introMessageLink = interaction.message.content.split(' ')[2];
+    deleteBadIntro(introMessageLink, client.channels.cache.get(mapLogChannelIdToIntroChannelId(interaction.channelId)));
 
-    interaction.update({content: `${interaction.member.user} kicked ${member.user} (${member.user.username})`, components: []})
+    hasSucceeded = false;
+    retries = 0;
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await member.ban({reason: 'Banned for intro so either underage or obvious troll'});
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
+
+    hasSucceeded = false;
+    retries = 0;
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await interaction.update({content: `${interaction.member.user} banned ${member.user} (${member.user.username})`, components: []})
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
+  }
+}
+
+async function handleKickClick(interaction) {
+  const member = interaction.message.mentions.members.first();
+
+  let hasSucceeded = false;
+  let retries = 0;
+
+  if (!member) {
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await interaction.send({
+          content: `I ran in to an issue doing that, please do it manually`,
+        });
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
+    return;
+  } else {
+    const introMessageLink = interaction.message.content.split(' ')[2];
+    deleteBadIntro(introMessageLink, client.channels.cache.get(mapLogChannelIdToIntroChannelId(interaction.channelId)));
+
+    hasSucceeded = false;
+    retries = 0;
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await member.kick(['Kicked for intro so probably too horny']);
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
+
+    hasSucceeded = false;
+    retries = 0;
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await interaction.update({content: `${interaction.member.user} kicked ${member.user} (${member.user.username})`, components: []})
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
+  }
+}
+
+async function handleShowIntroModal(interaction) {
+  let hasSucceeded = false;
+  let retries = 0;
+  while (!hasSucceeded && retries < 2) {
+    try {
+      await interaction.showModal(getIntroModal());
+      hasSucceeded = true;
+    } catch (err) {
+      retries = retries + 1;
+      if (retries >= 2) {
+        console.log(err);
+      }
+    }
   }
 }
 
 async function doStickyStuff(channel) {
   var lastChannelMessage = null;
-  await channel.messages.fetch({ limit: 1 }).then(messages => {
-    lastChannelMessage = messages.first();
-  })
-  if (!lastChannelMessage || (!!lastChannelMessage && lastChannelMessage.author.id !== client.user.id)) {
-    const otherMessagesFromBot = [];
-    await channel.messages.fetch({ limit: 99 }).then(messages => {
-      messages.forEach(message => {
-        if (message.author.id === client.user.id) {
-          otherMessagesFromBot.push(message);
-        }
-      })
-    });
-    await channel.bulkDelete(otherMessagesFromBot);
-    const intro = new ButtonBuilder()
-    .setCustomId('intro')
-    .setLabel('Begin Intro')
-    .setStyle(ButtonStyle.Primary);
-
-    const row = new ActionRowBuilder()
-      .addComponents(intro);
+  let hasSucceeded = false;
+  let retries = 0;
+  while (!hasSucceeded && retries < 2) {
+    try {
+      await channel.messages.fetch({ limit: 1 }).then(messages => {
+        lastChannelMessage = messages.first();
+      });
+      if (shouldResendSticky(lastChannelMessage)) {
+        const otherMessagesFromBot = [];
+        await channel.messages.fetch({ limit: 99 }).then(messages => {
+          messages.forEach(message => {
+            if ((message.author.id === client.user.id) && (message.embeds.length > 0)) {
+              otherMessagesFromBot.push(message);
+            }
+          })
+        });
+        await channel.bulkDelete(otherMessagesFromBot);
+        const intro = new ButtonBuilder()
+        .setCustomId('intro')
+        .setLabel('Begin Intro')
+        .setStyle(ButtonStyle.Primary);
     
-    const embed = new EmbedBuilder()
-      .setColor(0x0099FF)
-      .setTitle('How to Gain Entry to the Server')
-      .setDescription("To get started in this server first you'll need to generate an intro. Click the **Begin Intro** button below.\n\nOnce you've made your intro please wait for a staff member to review and grant you access.\n\n__PLEASE NOTE THIS IS **NOT** A PORN SERVER__")
-      .setTimestamp()
-    channel.send({
-      embeds: [embed],
-      components: [row]});
+        const row = new ActionRowBuilder()
+          .addComponents(intro);
+        
+        const embed = new EmbedBuilder()
+          .setColor(0x0099FF)
+          .setTitle('How to Gain Entry to the Server')
+          .setDescription("To get started in this server first you'll need to generate an intro. Click the **Begin Intro** button below.\n\nOnce you've made your intro please wait for a staff member to review and grant you access.\n\n__PLEASE NOTE THIS IS **NOT** A PORN SERVER__")
+          .setTimestamp()
+        channel.send({
+          embeds: [embed],
+          components: [row]});
+      }
+      hasSucceeded = true;
+    } catch (err) {
+      retries = retries + 1;
+      if (retries >= 2) {
+        console.log(err);
+      }
+    }
+  }
+}
+
+function shouldResendSticky(lastChannelMessage) {
+  if (!lastChannelMessage) {
+    return true; 
+  } else {
+      if (lastChannelMessage.author.id !== client.user.id) {
+        return true;
+      } else {
+        return lastChannelMessage.embeds.length > 0 ? false : true;
+      }
+  }
+}
+
+async function deleteBadIntro(url, channel) {
+  const x = url.split('/');
+  const messageId = x[x.length - 1];
+  let foundMessage;
+  await channel.messages.fetch(messageId).then(message => {
+    foundMessage = message
+  });
+  if (!!foundMessage) {
+    let hasSucceeded = false;
+    let retries = 0;
+    while (!hasSucceeded && retries < 2) {
+      try {
+        await foundMessage.delete();
+        hasSucceeded = true;
+      } catch (err) {
+        retries = retries + 1;
+        if (retries >= 2) {
+          console.log(err);
+        }
+      }
+    }
   }
 }
 
@@ -487,7 +843,9 @@ async function doStickyStuff(channel) {
 client.on('interactionCreate', async (interaction) => {
   if(interaction.commandName === 'intro') await interaction.showModal(getIntroModal());
 
-  if(interaction.isModalSubmit()) await handleModalSubmit(interaction);
+  if(interaction.isModalSubmit() && interaction.customId === 'introModal') await handleIntroModalSubmit(interaction);
+  
+  if(interaction.isModalSubmit() && interaction.customId === 'rejectModal') await handleRejectModalSubmit(interaction);
 
   if(interaction.isButton()) await handleButtonClick(interaction);
 });
