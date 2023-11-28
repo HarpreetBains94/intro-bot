@@ -285,8 +285,8 @@ function getLogButtonMessage(introMessage) {
   const user = introMessage.mentions.members.first().user;
   let message = `New Intro: ${introMessage.url} from ${user} (${user.username})`
   const accountAge = user.createdAt;
-  if ((new Date().getTime() - accountAge.getTime()) < 604800000) {
-    message = message + ` Warning, the users account was created recently (${accountAge.toLocaleDateString} - ${accountAge.toLocaleTimeString()})`
+  if ((new Date().getTime() - accountAge.getTime()) < 2592000000) {
+    message = message + `⚠️ Warning, the users account was created recently (less than 30 days old) ⚠️`
   }
   return message;
 }
@@ -352,6 +352,10 @@ function getIntroModal() {
   return modal;
 }
 
+// ############################
+// Interaction Helper Functions
+//#############################
+
 async function handleIntroModalSubmit(interaction) {
   try {
     await interaction.reply({
@@ -360,6 +364,7 @@ async function handleIntroModalSubmit(interaction) {
     })
   } catch (err) {
     console.log(err)
+    return;
   }
 
   age = parseInt(interaction.fields.getTextInputValue('ageInput'));
@@ -388,10 +393,11 @@ async function handleRejectModalSubmit(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
-    return
+    return;
   } else {
     const introMessageLink = interaction.message.content.split(' ')[2];
     deleteBadIntro(introMessageLink, client.channels.cache.get(mapLogChannelIdToIntroChannelId(interaction.channelId)));
@@ -406,6 +412,7 @@ async function handleRejectModalSubmit(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -422,6 +429,7 @@ async function handleRejectModalSubmit(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -450,6 +458,7 @@ async function handleUnderageUser(interaction, age) {
       retries = retries + 1;
       if (retries >= 2) {
         console.log(err);
+        return;
       }
     }
   }
@@ -498,6 +507,7 @@ async function sendIntroAndLogMessage(interaction) {
       retries = retries + 1;
       if (retries >= 2) {
         console.log(err);
+        return;
       }
     }
   }
@@ -515,6 +525,7 @@ async function sendIntroAndLogMessage(interaction) {
       retries = retries + 1;
       if (retries >= 2) {
         console.log(err);
+        return;
       }
     }
   }
@@ -555,6 +566,7 @@ async function handleApproveClick(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -570,6 +582,7 @@ async function handleApproveClick(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -584,6 +597,7 @@ async function handleApproveClick(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -602,6 +616,7 @@ async function handleRejectClick(interaction) {
       retries = retries + 1;
       if (retries >= 2) {
         console.log(err);
+        return;
       }
     }
   }
@@ -645,6 +660,7 @@ async function handleBanClick(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -663,6 +679,7 @@ async function handleBanClick(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -677,6 +694,7 @@ async function handleBanClick(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -700,6 +718,7 @@ async function handleKickClick(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -718,6 +737,7 @@ async function handleKickClick(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -732,6 +752,7 @@ async function handleKickClick(interaction) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -749,6 +770,7 @@ async function handleShowIntroModal(interaction) {
       retries = retries + 1;
       if (retries >= 2) {
         console.log(err);
+        return;
       }
     }
   }
@@ -795,6 +817,7 @@ async function doStickyStuff(channel) {
       retries = retries + 1;
       if (retries >= 2) {
         console.log(err);
+        return;
       }
     }
   }
@@ -830,6 +853,7 @@ async function deleteBadIntro(url, channel) {
         retries = retries + 1;
         if (retries >= 2) {
           console.log(err);
+          return;
         }
       }
     }
@@ -849,3 +873,8 @@ client.on('interactionCreate', async (interaction) => {
 
   if(interaction.isButton()) await handleButtonClick(interaction);
 });
+
+
+// TODO:
+// move code out to separate files
+// add function for handling retries that accepts a callback
