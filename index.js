@@ -357,13 +357,14 @@ function getIntroModal() {
 //#############################
 
 async function handleIntroModalSubmit(interaction) {
+  console.log(`Start intro modal submit member: ${interaction.member.user.username}`);
   try {
     await interaction.reply({
       content: 'Generating your intro now! Server staff will review it and grant you entrance in to the server.',
       ephemeral: true
     })
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return;
   }
 
@@ -374,11 +375,14 @@ async function handleIntroModalSubmit(interaction) {
   } else {
     await sendIntroAndLogMessage(interaction)
   }
+  console.log(`Done intro modal submit member: ${interaction.member.user.username}`);
 }
 
 async function handleRejectModalSubmit(interaction) {
   const member = interaction.message.mentions.members.first();
   const reason = interaction.fields.getTextInputValue('rejectionReason');
+
+  console.log(`Start rejection modal submit member: ${member.user.username}`);
 
   let hasSucceeded = false;
   let retries = 0;
@@ -434,6 +438,8 @@ async function handleRejectModalSubmit(interaction) {
       }
     }
   }
+
+  console.log(`Done rejection modal submit member: ${member.user.username}`);
 }
 
 async function handleUnderageUser(interaction, age) {
@@ -552,6 +558,8 @@ async function handleApproveClick(interaction) {
   const role = interaction.member.guild.roles.cache.get(mapLogChannelIdToApprovedRoleId(interaction.channelId));
   const member = interaction.message.mentions.members.first();
 
+  console.log(`Start approving member: ${member.user.username}`);
+
   let hasSucceeded = false;
   let retries = 0;
 
@@ -602,10 +610,13 @@ async function handleApproveClick(interaction) {
       }
     }
   }
+
+  console.log(`Done approving member: ${member.user.username}`);
 }
 
 async function handleRejectClick(interaction) {
   const member = interaction.message.mentions.members.first();
+  console.log(`Start reject member button click: ${member.user.username}`);
   let hasSucceeded = false;
   let retries = 0;
   while (!hasSucceeded && retries < 2) {
@@ -620,12 +631,13 @@ async function handleRejectClick(interaction) {
       }
     }
   }
+  console.log(`Done reject member button click: ${member.user.username}`);
 }
 
 function getRejectModal(member) {
   const modal = new ModalBuilder()
     .setCustomId('rejectModal')
-    .setTitle(`Rejecting ${member.username}`);
+    .setTitle(`Rejecting ${member.user.username}`);
 
   const reason = new TextInputBuilder()
     .setCustomId('rejectionReason')
@@ -645,6 +657,8 @@ function getRejectModal(member) {
 
 async function handleBanClick(interaction) {
   const member = interaction.message.mentions.members.first();
+
+  console.log(`Start ban member: ${member.user.username}`);
 
   let hasSucceeded = false;
   let retries = 0;
@@ -699,10 +713,14 @@ async function handleBanClick(interaction) {
       }
     }
   }
+
+  console.log(`Done ban member: ${member.user.username}`);
 }
 
 async function handleKickClick(interaction) {
   const member = interaction.message.mentions.members.first();
+
+  console.log(`Start kick member: ${member.user.username}`);
 
   let hasSucceeded = false;
   let retries = 0;
@@ -757,6 +775,8 @@ async function handleKickClick(interaction) {
       }
     }
   }
+
+  console.log(`Done kick member: ${member.user.username}`);
 }
 
 async function handleShowIntroModal(interaction) {
