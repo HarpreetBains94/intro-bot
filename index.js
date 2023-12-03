@@ -51,7 +51,6 @@ async function setupCommands() {
     description: 'Begin making your intro',
   }
 ];
-
   await rest.put(Routes.applicationCommands(DISCORD_APP_ID), {
     body: commands,
   })
@@ -60,6 +59,10 @@ async function setupCommands() {
 setupCommands();
 
 client.login(DISCORD_DEV_TOKEN);
+
+process.on('unhandledRejection', error => {
+	console.error('Unhandled promise rejection:', error);
+});
 
 // ############################
 // Helper Functions
@@ -375,7 +378,7 @@ async function handleIntroModalSubmit(interaction) {
   } else {
     await sendIntroAndLogMessage(interaction)
   }
-  console.log(`Done intro modal submit member: ${interaction.member.user.username}`);
+  console.log(`End intro modal submit member: ${interaction.member.user.username}`);
 }
 
 async function handleRejectModalSubmit(interaction) {
@@ -439,7 +442,7 @@ async function handleRejectModalSubmit(interaction) {
     }
   }
 
-  console.log(`Done rejection modal submit member: ${member.user.username}`);
+  console.log(`End rejection modal submit member: ${member.user.username}`);
 }
 
 async function handleUnderageUser(interaction, age) {
@@ -611,7 +614,7 @@ async function handleApproveClick(interaction) {
     }
   }
 
-  console.log(`Done approving member: ${member.user.username}`);
+  console.log(`End approving member: ${member.user.username}`);
 }
 
 async function handleRejectClick(interaction) {
@@ -631,7 +634,7 @@ async function handleRejectClick(interaction) {
       }
     }
   }
-  console.log(`Done reject member button click: ${member.user.username}`);
+  console.log(`End reject member button click: ${member.user.username}`);
 }
 
 function getRejectModal(member) {
@@ -683,11 +686,29 @@ async function handleBanClick(interaction) {
     const introMessageLink = interaction.message.content.split(' ')[2];
     deleteBadIntro(introMessageLink, client.channels.cache.get(mapLogChannelIdToIntroChannelId(interaction.channelId)));
 
+    if (!member.bannable) {
+      hasSucceeded = false;
+      retries = 0;
+      while (!hasSucceeded && retries < 2) {
+        try {
+          await interaction.update({content: `INFO: ${member.user} (${member.user.username}) could not be banned. This is either due to them already having left the server, the user is an admin, or there is a bot error. Please ban them manually.`, components: []});
+          hasSucceeded = true;
+        } catch (err) {
+          retries = retries + 1;
+          if (retries >= 2) {
+            console.log(err);
+            return;
+          }
+        }
+      }
+      return;
+    }
+    
     hasSucceeded = false;
     retries = 0;
     while (!hasSucceeded && retries < 2) {
       try {
-        await member.ban({reason: 'Banned for intro so either underage or obvious troll'});
+        await member.ban({reason: 'Banned for intro so either underage or obvious troll'}).catch(console.error);
         hasSucceeded = true;
       } catch (err) {
         retries = retries + 1;
@@ -714,7 +735,7 @@ async function handleBanClick(interaction) {
     }
   }
 
-  console.log(`Done ban member: ${member.user.username}`);
+  console.log(`End ban member: ${member.user.username}`);
 }
 
 async function handleKickClick(interaction) {
@@ -776,7 +797,7 @@ async function handleKickClick(interaction) {
     }
   }
 
-  console.log(`Done kick member: ${member.user.username}`);
+  console.log(`End kick member: ${member.user.username}`);
 }
 
 async function handleShowIntroModal(interaction) {
@@ -856,6 +877,7 @@ function shouldResendSticky(lastChannelMessage) {
 }
 
 async function deleteBadIntro(url, channel) {
+  console.log('Deleting bad intro');
   const x = url.split('/');
   const messageId = x[x.length - 1];
   let foundMessage;
@@ -893,8 +915,3 @@ client.on('interactionCreate', async (interaction) => {
 
   if(interaction.isButton()) await handleButtonClick(interaction);
 });
-
-
-// TODO:
-// move code out to separate files
-// add function for handling retries that accepts a callback
