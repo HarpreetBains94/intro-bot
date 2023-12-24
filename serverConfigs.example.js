@@ -11,6 +11,7 @@ module.exports = {
       logChannelId: '', // Log channel (this is where mods will be able to approve/reject intros)
       modRoleId: '',  // Id of the role you want to be able to approve/reject intros (usually mods)
       approvedRoleId: '', // Id of the role you want to give users once their intro is approved
+      introMessage: '', // Message for the sticky bot to send with the begin intro message
       rejectRoleId: '', // Id of the role you want to purge when using the purge command
     }
   ]
