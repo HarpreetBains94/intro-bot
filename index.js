@@ -23,7 +23,7 @@ const client = new Client({
 const rest = new REST({version: '10'}).setToken(DISCORD_DEV_TOKEN);
 
 client.once('ready', (c) => {
-    console.log('${c.user.tag} Loaded!');
+    console.log(`${c.user.tag} Loaded!`);
     setInterval(async () => {
       getServers().forEach(async (server) => {
         const channel = client.channels.cache.get(server.startChannelId);
