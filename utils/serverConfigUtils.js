@@ -38,6 +38,11 @@ const getRejectRoleId = (id) => {
   return server.rejectRoleId;
 };
 
+const getServerName = (id) => {
+  const server = getServerForId(id);
+  return server.serverName;
+};
+
 const getServers = () => {
   return servers;
 };
@@ -49,5 +54,6 @@ module.exports = {
   getModRoleId,
   getApprovedRoleId,
   getRejectRoleId,
+  getServerName,
   getServers
 };

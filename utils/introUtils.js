@@ -1,6 +1,6 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { wrapAsyncCallbackInRetry } = require('./utils');
-const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId } = require('./serverConfigUtils');
+const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName } = require('./serverConfigUtils');
 
 const getIntroModal = () => {
   const modal = new ModalBuilder()
@@ -68,19 +68,20 @@ const randomIntFromInterval = (min, max) => { // min and max included
 };
 
 const generateIntro = (interaction) => {
+  const serverName = getServerName(interaction.guildId);
   const age = interaction.fields.getTextInputValue('ageInput');
   const name = interaction.fields.getTextInputValue('nameInput');
   const pronouns = interaction.fields.getTextInputValue('pronounInput');
   const location = interaction.fields.getTextInputValue('locationInput');
   const hobbies = interaction.fields.getTextInputValue('hobbiesInput');
-  return `${getNewLine()}\n${getFirstLine(interaction.user, name)} ${getSecondLine(name, age, location)} Their pronouns are **${pronouns}**. ${getFinalLine(name, hobbies)}`;
+  return `${getNewLine()}\n${getFirstLine(interaction.user, name, serverName)} ${getSecondLine(name, age, location)} Their pronouns are **${pronouns}**. ${getFinalLine(name, hobbies)}`;
 };
 
 const getNewLine = () => {
   return '♡‧₊˚✧ ૮ ˶ᵔ ᵕ ᵔ˶ ა ✧˚₊‧♡';
 };
 
-const getFirstLine = (user, name) => {
+const getFirstLine = (user, name, serverName) => {
   switch (randomIntFromInterval(1, 21)) {
     case 1:
     case 2:
@@ -91,31 +92,31 @@ const getFirstLine = (user, name) => {
     case 8:
     case 9:
     case 10:
-      return `Everyone join me in welcoming **${user}** (A.K.A. **${name}**) to The Gayborhood!!`;
+      return `Everyone join me in welcoming **${user}** (A.K.A. **${name}**) to ${serverName}!!`;
     case 11:
       return `Hey everyone! **${user}** (A.K.A. **${name}**) wanted me to tell you that they're here to chew ass and kick bubble gum, and they're all out of bubble gum.`
     case 12:
       return `Whoa, lock up your twinks; there's a new daddy in town. Say hello to **${user}** (A.K.A. **${name}**)!`;
     case 13:
-      return `Gayborhood Association is proud to present **${user}** (A.K.A. **${name}**) as the newest member on the block.`;
+      return `${serverName} Association is proud to present **${user}** (A.K.A. **${name}**) as the newest member on the block.`;
     case 14:
-      return `The Gayborhood is just taking in anybody these days.... Say hi to **${user}**  (A.K.A. **${name}**).`;
+      return `${serverName} is just taking in anybody these days.... Say hi to **${user}**  (A.K.A. **${name}**).`;
     case 15:
-      return `The Gayborhood had a **${user}** sized hole and they've decided to fill it. Thank you for filling our hole **${name}**!`;
+      return `${serverName} had a **${user}** sized hole and they've decided to fill it. Thank you for filling our hole **${name}**!`;
     case 16:
-      return `uwu the Gayborhood just got a bit more kawaii ^-^, someone joined and its a cutie patootie called senpai **${user}** (but u bakas can call them **${name}** >_<).`;
+      return `uwu ${serverName} just got a bit more kawaii ^-^, someone joined and its a cutie patootie called senpai **${user}** (but u bakas can call them **${name}** >_<).`;
     case 17:
       return `🚨WEEWOO WEEWOO🚨 Someone call the dingus police, we caught another one. This one's called **${user}**  (A.K.A. **${name}**).`;
     case 18:
       return `Is it hot in here or is it just **${user}**  (A.K.A. **${name}**)? (It could be global warming too, please do what you can to reduce your individual impact. More importantly threaten violence on the ruling capitalist class).`
     case 19:
-      return `My fellow humans (of which I am totally one. Ignore the badge that says bot, its a discord glitch. I am a 100% totally flesh based being) join me in welcoming **${user}** (A.K.A. **${name}**) to The Gayborhood!`;
+      return `My fellow humans (of which I am totally one. Ignore the badge that says bot, its a discord glitch. I am a 100% totally flesh based being) join me in welcoming **${user}** (A.K.A. **${name}**) to ${serverName}!`;
     case 20:
       return `Oi you lot. A new leng ting moved their fine nyash to the ends. Say wagwan to **${user}** (A.K.A. **${name}**).`;
     case 21:
       return `01101011 01101001 01101100 01101100 00100000 01100001 01101100 01101100 00100000 01101000 01110101 01101101 01100001 01101110 01110011. Oh sorry didn't see you there. Everyone, heres **${user}** (A.K.A. **${name}**). Be nice to them like I am with all humans.`;
     default:
-      return `Everyone join me in welcoming **${user}** (A.K.A. **${name}**) to The Gayborhood!!`;
+      return `Everyone join me in welcoming **${user}** (A.K.A. **${name}**) to ${serverName}!!`;
   }
 };
 
