@@ -16,6 +16,8 @@ Move in to the repo and install the dependencies:
 
 `npm install`
 
+Next create a .env file in the project root and add your DISCORD_DEV_TOKEN and DISCORD_APP_ID to it.
+
 Finally add your server(s) details to serverConfigs.example.js and remove the '.example' from the filename.
 
 ### Post Setup
