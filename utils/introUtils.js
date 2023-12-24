@@ -69,6 +69,7 @@ const randomIntFromInterval = (min, max) => { // min and max included
 
 const generateIntro = (interaction) => {
   const serverName = getServerName(interaction.guildId);
+  console.log(serverName);
   const age = interaction.fields.getTextInputValue('ageInput');
   const name = interaction.fields.getTextInputValue('nameInput');
   const pronouns = interaction.fields.getTextInputValue('pronounInput');

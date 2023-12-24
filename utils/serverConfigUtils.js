@@ -40,7 +40,7 @@ const getRejectRoleId = (id) => {
 
 const getServerName = (id) => {
   const server = getServerForId(id);
-  return server.serverName;
+  return server.name;
 };
 
 const getServers = () => {
