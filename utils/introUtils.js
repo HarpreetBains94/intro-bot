@@ -229,6 +229,10 @@ const handleIntroModalSubmit = async (interaction, client) => {
 
 const handleRejectModalSubmit = async (interaction, client) => {
   const member = interaction.message.mentions.members.first();
+  if (!member) {
+    await handleNoMember(interaction);
+    return;
+  }
   const reason = interaction.fields.getTextInputValue('rejectionReason');
 
   console.log(`Start rejection modal submit member: ${member.user.username}`);
@@ -387,6 +391,10 @@ const interactingUserHasApproverRole = (interaction) => {
 const handleApproveClick = async (interaction) => {
   const role = interaction.member.guild.roles.cache.get(getApprovedRoleId(interaction.guildId));
   const member = interaction.message.mentions.members.first();
+  if (!member) {
+    await handleNoMember(interaction);
+    return;
+  }
 
   console.log(`Start approving member: ${member.user.username}`);
 
@@ -429,6 +437,10 @@ const handleApproveClick = async (interaction) => {
 
 const handleRejectClick = async (interaction) => {
   const member = interaction.message.mentions.members.first();
+  if (!member) {
+    await handleNoMember(interaction);
+    return;
+  }
   console.log(`Start reject member button click: ${member.user.username}`);
   await wrapAsyncCallbackInRetry(async () => {
     await interaction.showModal(getRejectModal(member));
@@ -459,6 +471,10 @@ const getRejectModal = (member) => {
 
 const handleBanClick = async (interaction, client) => {
   const member = interaction.message.mentions.members.first();
+  if (!member) {
+    await handleNoMember(interaction);
+    return;
+  }
 
   console.log(`Start ban member: ${member.user.username}`);
 
@@ -518,6 +534,10 @@ const handleBanClick = async (interaction, client) => {
 
 const handleKickClick = async (interaction, client) => {
   const member = interaction.message.mentions.members.first();
+  if (!member) {
+    await handleNoMember(interaction);
+    return;
+  }
 
   console.log(`Start kick member: ${member.user.username}`);
 
@@ -581,6 +601,14 @@ const deleteBadIntro = async (url, channel) => {
   }
   console.log('Done deleting bad intro');
 };
+
+const handleNoMember = async (interaction) => {
+  await wrapAsyncCallbackInRetry(async () => {
+    interaction.reply({
+      content: 'Interaction Failed, probably due to member already leaving the server. Please delete intro log message (the one with the buttons) and their intro manually.'
+    });
+  });
+}
 
 module.exports = {
   handleIntroModalSubmit,
