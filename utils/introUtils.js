@@ -398,9 +398,6 @@ const handleApproveClick = async (interaction) => {
 
   console.log(`Start approving member: ${member.user.username}`);
 
-  let hasSucceeded = false;
-  let retries = 0;
-
   if (!role || !member) {
 
     await wrapAsyncCallbackInRetry(async () => {
@@ -478,9 +475,6 @@ const handleBanClick = async (interaction, client) => {
 
   console.log(`Start ban member: ${member.user.username}`);
 
-  let hasSucceeded = false;
-  let retries = 0;
-
   if (!member) {
     await wrapAsyncCallbackInRetry(async () => {
       await interaction.send({
@@ -533,6 +527,9 @@ const handleBanClick = async (interaction, client) => {
 };
 
 const handleKickClick = async (interaction, client) => {
+  const introMessageLink = interaction.message.content.split(' ')[2];
+  await deleteBadIntro(introMessageLink, client.channels.cache.get(getIntroChannelId(interaction.guildId)));
+
   const member = interaction.message.mentions.members.first();
   if (!member) {
     await handleNoMember(interaction);
@@ -540,9 +537,6 @@ const handleKickClick = async (interaction, client) => {
   }
 
   console.log(`Start kick member: ${member.user.username}`);
-
-  let hasSucceeded = false;
-  let retries = 0;
 
   if (!member) {
     await wrapAsyncCallbackInRetry(async () => {
@@ -552,9 +546,6 @@ const handleKickClick = async (interaction, client) => {
     }, 2);
     return;
   } else {
-    const introMessageLink = interaction.message.content.split(' ')[2];
-    deleteBadIntro(introMessageLink, client.channels.cache.get(getIntroChannelId(interaction.guildId)));
-
     const hasSuccessfullyKickedMember = await wrapAsyncCallbackInRetry(async () => {
       await member.kick(['Kicked for intro so probably too horny']);
     }, 2);
@@ -591,9 +582,15 @@ const deleteBadIntro = async (url, channel) => {
   const x = url.split('/');
   const messageId = x[x.length - 1];
   let foundMessage;
-  await channel.messages.fetch(messageId).then(message => {
-    foundMessage = message
-  });
+  await channel.messages.fetch(messageId)
+    .then(message => {
+      foundMessage = message
+    })
+    .catch((err) => {
+      console.log('#### Failed deleting intro, message not found ####');
+      console.log(err);
+      console.log('##################################################');
+    });
   if (!!foundMessage) {
     await wrapAsyncCallbackInRetry(async () => {
       await foundMessage.delete();
@@ -604,10 +601,11 @@ const deleteBadIntro = async (url, channel) => {
 
 const handleNoMember = async (interaction) => {
   await wrapAsyncCallbackInRetry(async () => {
-    interaction.reply({
-      content: 'Interaction Failed, probably due to member already leaving the server. Please delete intro log message (the one with the buttons) and their intro manually.'
+    await interaction.update({
+      content: 'Interaction Failed, probably due to member already leaving the server. Please manually confirm the member is no longer in the server and that their intro has been deleted.',
+      components: []
     });
-  });
+  }, 2);
 }
 
 module.exports = {
