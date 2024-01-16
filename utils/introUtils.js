@@ -246,7 +246,7 @@ const handleRejectModalSubmit = async (interaction, client) => {
     return;
   } else {
     const introMessageLink = interaction.message.content.split(' ')[2];
-    deleteBadIntro(introMessageLink, client.channels.cache.get(getIntroChannelId(interaction.guildId)));
+    await deleteBadIntro(introMessageLink, client.channels.cache.get(getIntroChannelId(interaction.guildId)));
 
     const hasSuccessfullySentRejectionLogMessage = await wrapAsyncCallbackInRetry(async () => {
       await interaction.update(
@@ -277,7 +277,7 @@ const handleRejectModalSubmit = async (interaction, client) => {
 const handleUnderageUser = async (interaction, age, client) => {
   console.log(`Start underage log message member: ${interaction.member.user.username}`);
   const ban = new ButtonBuilder()
-    .setCustomId('ban')
+    .setCustomId('banAge')
     .setLabel('Ban')
     .setStyle(ButtonStyle.Danger);
 
@@ -377,7 +377,9 @@ const handleButtonClick = async (interaction, client) => {
     
     if (interaction.customId === 'kick') handleKickClick(interaction, client);
     
-    if (interaction.customId === 'ban') handleBanClick(interaction, client);
+    if (interaction.customId === 'ban') handleBanClickAndDeleteBadIntro(interaction, client);
+
+    if (interaction.customId === 'banAge') handleBanClick(interaction);
 
     if (interaction.customId === 'reject') handleRejectClick(interaction);
   }
@@ -466,7 +468,13 @@ const getRejectModal = (member) => {
   return modal;
 };
 
-const handleBanClick = async (interaction, client) => {
+const handleBanClickAndDeleteBadIntro = async (interaction, client) => {
+  const introMessageLink = interaction.message.content.split(' ')[2];
+  await deleteBadIntro(introMessageLink, client.channels.cache.get(getIntroChannelId(interaction.guildId)));
+  await handleBanClick(interaction);
+}
+
+const handleBanClick = async (interaction) => {
   const member = interaction.message.mentions.members.first();
   if (!member) {
     await handleNoMember(interaction);
@@ -483,9 +491,6 @@ const handleBanClick = async (interaction, client) => {
     }, 2);
     return;
   } else {
-    const introMessageLink = interaction.message.content.split(' ')[2];
-    deleteBadIntro(introMessageLink, client.channels.cache.get(getIntroChannelId(interaction.guildId)));
-
     if (!member.bannable) {
       const hasSuccessfullySentMemberNotBannableMessage = await wrapAsyncCallbackInRetry(async () => {
         await interaction.update(
