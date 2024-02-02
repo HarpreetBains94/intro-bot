@@ -43,6 +43,11 @@ const getServerName = (id) => {
   return server.name;
 };
 
+const getServerRejectTime = (id) => {
+  const server = getServerForId(id);
+  return server.rejectTime;
+}
+
 const getServers = () => {
   return servers;
 };
@@ -55,5 +60,6 @@ module.exports = {
   getApprovedRoleId,
   getRejectRoleId,
   getServerName,
-  getServers
+  getServers,
+  getServerRejectTime
 };

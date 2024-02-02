@@ -1,5 +1,7 @@
-const { getRejectRoleId, getModRoleId } = require('./serverConfigUtils');
+const { getRejectRoleId, getModRoleId, getServerRejectTime } = require('./serverConfigUtils');
 const { wrapAsyncCallbackInRetry } = require('./utils');
+
+const MILLISECONDS_IN_AN_HOUR = 3600000;
 
 const interactingUserHasApproverRole = (interaction) => {
   return interaction.member.roles.cache.has(getModRoleId(interaction.guildId));
@@ -14,7 +16,7 @@ const getGuild = async (interaction, client) => {
 };
 
 const doPrune = async (interaction, client) => {
-  
+  const rejectTime = getServerRejectTime(interaction.guildId);
   await wrapAsyncCallbackInRetry(async () => {
     if (!interactingUserHasApproverRole(interaction)) {
       await interaction.reply({
@@ -36,8 +38,10 @@ const doPrune = async (interaction, client) => {
     }
     let members = [];
     rolesManager.members.forEach(member => {
-      members.push(member)
-      member.kick();
+      if (((new Date().getTime() - member.joinedTimestamp) / MILLISECONDS_IN_AN_HOUR) > rejectTime) {
+        members.push(member);
+        member.kick();
+      }
     });
     await interaction.reply({
       content: `Purged the following members: ${members}`,
