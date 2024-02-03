@@ -1,6 +1,6 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { wrapAsyncCallbackInRetry } = require('./utils');
-const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName } = require('./serverConfigUtils');
+const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId } = require('./serverConfigUtils');
 
 const getIntroModal = () => {
   const modal = new ModalBuilder()
@@ -259,11 +259,9 @@ const handleRejectModalSubmit = async (interaction, client) => {
     if (!hasSuccessfullySentRejectionLogMessage) {
       return;
     }
-    
+    const serverName = getServerName(interaction.guildId);
     const hasSuccessfullySentRejectionMessage = await wrapAsyncCallbackInRetry(async () => {
-      await client.channels.cache.get(getStartChannelId(interaction.guildId)).send({
-        content: `${member} your intro has been rejected for the following reason:\n\n"${reason}"\n\n Please try again.`
-      });
+      await member.user.send(`Hey! FYI Your intro for "${serverName}" has been rejected for the following reason:\n\n"${reason}"\n\n Please try again or reach out to server staff.`);
     }, 2);
 
     if (!hasSuccessfullySentRejectionMessage) {
@@ -415,6 +413,11 @@ const handleApproveClick = async (interaction) => {
     if (!hasSuccessfullyAddedRole) {
       return;
     }
+
+    const serverName = getServerName(interaction.guildId);
+    await wrapAsyncCallbackInRetry(async () => {
+      await member.user.send(`Congrats! You have been approved as a member of "${serverName}"`);
+    }, 2);
 
     const hasSuccessfullySentApprovedLogMessage = await wrapAsyncCallbackInRetry(async () => {
       await interaction.update(
@@ -610,10 +613,59 @@ const handleNoMember = async (interaction) => {
       components: []
     });
   }, 2);
-}
+};
+
+const doApprove = async (interaction) => {
+  await wrapAsyncCallbackInRetry(async () => {
+    if (!interactingUserHasApproverRole(interaction)) {
+      await wrapAsyncCallbackInRetry(async () => {
+        await interaction.reply({
+          content: 'You do not have permissions to use this command.',
+          ephemeral: true,
+        });
+        return;
+      }, 2);
+      return;
+    }
+    const approvedRole = interaction.member.guild.roles.cache.get(getApprovedRoleId(interaction.guildId));
+    const rejectRole = interaction.member.guild.roles.cache.get(getRejectRoleId(interaction.guildId));
+    const serverName = getServerName(interaction.guildId);
+    const user = interaction.options.getUser('user');
+    const member = interaction.member.guild.members.cache.get(user.id);
+    if (!member) {
+      await wrapAsyncCallbackInRetry(async () => {
+        await interaction.reply({
+          content: 'Interaction failed, please manually add the approved role and remove the reject role from the user.'
+        });
+      }, 2);
+      return;
+    }
+    const hasSuccessfullyAddedRole = await wrapAsyncCallbackInRetry(async () => {
+      await member.roles.add(approvedRole);
+    }, 2);
+
+    const hasSuccessfullyRemovedRole = await wrapAsyncCallbackInRetry(async () => {
+      await member.roles.remove(rejectRole);
+    }, 2);
+
+    let updates = hasSuccessfullyAddedRole ? 'Successfully added approved role. ' : 'Failed to add approved role, please do it manually. ';
+    updates += hasSuccessfullyRemovedRole ? 'Successfully removed reject role. ' : 'Failed to remove reject role, please do it manually. ';
+    await wrapAsyncCallbackInRetry(async () => {
+      await interaction.reply({
+        content: updates
+      });
+    }, 2);
+
+    await wrapAsyncCallbackInRetry(async () => {
+      await user.send(`Congrats! You have been approved as a member of "${serverName}"`);
+    }, 2);
+  }, 0);
+};
 
 module.exports = {
+  interactingUserHasApproverRole,
   handleIntroModalSubmit,
   handleRejectModalSubmit,
   handleButtonClick,
+  doApprove,
 };

@@ -1,7 +1,7 @@
 const wrapAsyncCallbackInRetry = async (asyncCallback, maxRetries) => {
   let hasSucceeded = false;
   let retries = 0;
-  while (!hasSucceeded && retries < maxRetries) {
+  while (!hasSucceeded && retries <= maxRetries) {
     try {
       await asyncCallback();
       hasSucceeded = true;

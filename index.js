@@ -1,5 +1,5 @@
 const { Client, IntentsBitField, Routes, REST } = require('discord.js');
-const { handleIntroModalSubmit, handleRejectModalSubmit, handleButtonClick } = require('./utils/introUtils');
+const { handleIntroModalSubmit, handleRejectModalSubmit, handleButtonClick, doApprove } = require('./utils/introUtils');
 const { getServers } = require('./utils/serverConfigUtils');
 const { doStickyStuff } = require('./utils/stickyUtils');
 const { doPrune } = require('./utils/purgeUtils');
@@ -39,7 +39,16 @@ async function setupCommands() {
   {
     name: 'purge-rejects',
     description: 'Purge users with the reject role',
-  },
+  }, {
+    name: 'approve-user',
+    description: 'Manually approve a user',
+    options: [{
+      name: 'user',
+      description: 'User to approve',
+      type: 6,
+      required: true,
+    }],
+  }
 ];
   await rest.put(Routes.applicationCommands(DISCORD_APP_ID), {
     body: commands,
@@ -56,6 +65,8 @@ process.on('unhandledRejection', error => {
 
 client.on('interactionCreate', async (interaction) => {
   if(interaction.commandName === 'purge-rejects') await doPrune(interaction, client);
+
+  if(interaction.commandName === 'approve-user') await doApprove(interaction);
 
   if(interaction.isModalSubmit() && interaction.customId === 'introModal') await handleIntroModalSubmit(interaction, client);
   
