@@ -4,6 +4,8 @@
 
 You will require git and node.js (v20+)
 
+You will also require [pm2 to be globally installed](https://pm2.keymetrics.io/docs/usage/quick-start/)
+
 ### Initial Setup
 
 Clone the project using:
