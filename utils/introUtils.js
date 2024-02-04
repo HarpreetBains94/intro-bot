@@ -1,6 +1,6 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { wrapAsyncCallbackInRetry } = require('./utils');
-const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId } = require('./serverConfigUtils');
+const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId, getServerHideIntroApproveFlow } = require('./serverConfigUtils');
 
 const getIntroModal = () => {
   const modal = new ModalBuilder()
@@ -297,15 +297,28 @@ const handleUnderageUser = async (interaction, age, client) => {
 
 const sendIntroAndLogMessage = async (interaction, client) => {
   console.log(`Start send intro and log message member: ${interaction.member.user.username}`);
-  const approve = new ButtonBuilder()
-    .setCustomId('approve')
-    .setLabel('Approve')
-    .setStyle(ButtonStyle.Success);
+  const hideIntroApproveFlow = getServerHideIntroApproveFlow(interaction.guildId); 
+  const row = new ActionRowBuilder();
+  if (!hideIntroApproveFlow) {
+    const approve = new ButtonBuilder()
+      .setCustomId('approve')
+      .setLabel('Approve')
+      .setStyle(ButtonStyle.Success);
+  
+    const reject = new ButtonBuilder()
+      .setCustomId('reject')
+      .setLabel('Reject')
+      .setStyle(ButtonStyle.Primary);
 
-  const reject = new ButtonBuilder()
-    .setCustomId('reject')
-    .setLabel('Reject')
-    .setStyle(ButtonStyle.Primary);
+    row.addComponents(approve, reject);
+  } else {
+    const acknowledge = new ButtonBuilder()
+      .setCustomId('acknowledge')
+      .setLabel('acknowledge')
+      .setStyle(ButtonStyle.Primary);
+
+    row.addComponents(acknowledge);
+  }
   
   const kick = new ButtonBuilder()
     .setCustomId('kick')
@@ -317,8 +330,7 @@ const sendIntroAndLogMessage = async (interaction, client) => {
     .setLabel('Ban')
     .setStyle(ButtonStyle.Danger);
 
-  const row = new ActionRowBuilder()
-    .addComponents(approve, reject, kick, ban);
+  row.addComponents(kick, ban);
 
   let introMessageContent = generateIntro(interaction);
 
@@ -371,6 +383,8 @@ const getLogButtonMessage = (introMessage) => {
 const handleButtonClick = async (interaction, client) => {
   if (interactingUserHasApproverRole(interaction)) {
     if (interaction.customId === 'approve') handleApproveClick(interaction);
+
+    if (interaction.customId === 'acknowledge') handleAcknowledgeClick(interaction);
     
     if (interaction.customId === 'kick') handleKickClick(interaction, client);
     
@@ -434,6 +448,23 @@ const handleApproveClick = async (interaction) => {
   }
 
   console.log(`End approving member: ${member.user.username}`);
+};
+
+const handleAcknowledgeClick = async (interaction) => {
+  const member = interaction.message.mentions.members.first();
+  if (!member) {
+    await handleNoMember(interaction);
+    return;
+  }
+
+  await wrapAsyncCallbackInRetry(async () => {
+    await interaction.update(
+      {
+        content: `${interaction.member.user} acknowledged ${member.user} (${member.user.username}) to join the server`,
+        components: []
+      }
+    );
+  }, 2);
 };
 
 const handleRejectClick = async (interaction) => {
