@@ -679,11 +679,12 @@ const doApprove = async (interaction) => {
       await member.roles.remove(rejectRole);
     }, 2);
 
-    let updates = hasSuccessfullyAddedRole ? 'Successfully added approved role. ' : 'Failed to add approved role, please do it manually. ';
+    let updates = `${member.user}: `;
+    updates += hasSuccessfullyAddedRole ? 'Successfully added approved role. ' : 'Failed to add approved role, please do it manually. ';
     updates += hasSuccessfullyRemovedRole ? 'Successfully removed reject role. ' : 'Failed to remove reject role, please do it manually. ';
     await wrapAsyncCallbackInRetry(async () => {
       await interaction.reply({
-        content: updates
+        content: updates,
       });
     }, 2);
 
