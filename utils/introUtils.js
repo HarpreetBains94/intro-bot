@@ -658,6 +658,7 @@ const doApprove = async (interaction) => {
       }, 2);
       return;
     }
+    const mod = interaction.member;
     const approvedRole = interaction.member.guild.roles.cache.get(getApprovedRoleId(interaction.guildId));
     const rejectRole = interaction.member.guild.roles.cache.get(getRejectRoleId(interaction.guildId));
     const serverName = getServerName(interaction.guildId);
@@ -679,11 +680,11 @@ const doApprove = async (interaction) => {
       await member.roles.remove(rejectRole);
     }, 2);
 
-    let updates = `${member.user}: `;
+    let updates = `${mod.user} approved ${member.user}: `;
     updates += hasSuccessfullyAddedRole ? 'Successfully added approved role. ' : 'Failed to add approved role, please do it manually. ';
     updates += hasSuccessfullyRemovedRole ? 'Successfully removed reject role. ' : 'Failed to remove reject role, please do it manually. ';
     await wrapAsyncCallbackInRetry(async () => {
-      await interaction.reply({
+      await client.channels.cache.get(getLogChannelId(interaction.guildId)).send({
         content: updates,
       });
     }, 2);
