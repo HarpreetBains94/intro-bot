@@ -66,7 +66,7 @@ process.on('unhandledRejection', error => {
 client.on('interactionCreate', async (interaction) => {
   if(interaction.commandName === 'purge-rejects') await doPrune(interaction, client);
 
-  if(interaction.commandName === 'approve-user') await doApprove(interaction);
+  if(interaction.commandName === 'approve-user') await doApprove(interaction, client);
 
   if(interaction.isModalSubmit() && interaction.customId === 'introModal') await handleIntroModalSubmit(interaction, client);
   

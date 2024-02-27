@@ -646,7 +646,7 @@ const handleNoMember = async (interaction) => {
   }, 2);
 };
 
-const doApprove = async (interaction) => {
+const doApprove = async (interaction, client) => {
   await wrapAsyncCallbackInRetry(async () => {
     if (!interactingUserHasApproverRole(interaction)) {
       await wrapAsyncCallbackInRetry(async () => {
@@ -686,6 +686,13 @@ const doApprove = async (interaction) => {
     await wrapAsyncCallbackInRetry(async () => {
       await client.channels.cache.get(getLogChannelId(interaction.guildId)).send({
         content: updates,
+      });
+    }, 2);
+
+    await wrapAsyncCallbackInRetry(async () => {
+      await interaction.reply({
+        content: 'Interaction complete, check the log channel for the status',
+        ephemeral: true,
       });
     }, 2);
 
