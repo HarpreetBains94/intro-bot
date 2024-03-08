@@ -28,7 +28,7 @@ client.once('ready', (c) => {
       getServers().forEach(async (server) => {
         const channel = client.channels.cache.get(server.startChannelId);
         if (!!channel) {
-          await doStickyStuff(channel, server.introMessage, client);
+          await doStickyStuff(channel, server.introTitle, server.introMessage, client);
         }
       })
     }, 30000);

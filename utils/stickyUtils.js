@@ -13,7 +13,7 @@ const shouldResendSticky = (lastChannelMessage, client) => {
   }
 };
 
-const doStickyStuff = async (channel, introMessage, client) => {
+const doStickyStuff = async (channel, introTitle, introMessage, client) => {
   var lastChannelMessage = null;
   await wrapAsyncCallbackInRetry(async () => {
     await channel.messages.fetch({ limit: 1 }).then(messages => {
@@ -39,7 +39,7 @@ const doStickyStuff = async (channel, introMessage, client) => {
       
       const embed = new EmbedBuilder()
         .setColor(0x0099FF)
-        .setTitle('How to Gain Entry to the Server')
+        .setTitle(introTitle)
         .setDescription(introMessage)
         .setTimestamp()
       channel.send({
