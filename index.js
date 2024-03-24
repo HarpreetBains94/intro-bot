@@ -40,6 +40,9 @@ async function setupCommands() {
     name: 'purge-rejects',
     description: 'Purge users with the reject role',
   }, {
+    name: 'ping',
+    description: 'Check if the bot is up',
+  }, {
     name: 'approve-user',
     description: 'Manually approve a user',
     options: [{
@@ -67,10 +70,16 @@ client.on('interactionCreate', async (interaction) => {
   if(interaction.commandName === 'purge-rejects') await doPrune(interaction, client);
 
   if(interaction.commandName === 'approve-user') await doApprove(interaction, client);
-
+  
   if(interaction.isModalSubmit() && interaction.customId === 'introModal') await handleIntroModalSubmit(interaction, client);
   
   if(interaction.isModalSubmit() && interaction.customId === 'rejectModal') await handleRejectModalSubmit(interaction, client);
-
+  
   if(interaction.isButton()) await handleButtonClick(interaction, client);
+
+  if (interaction.commandName === 'ping') {
+    await interaction.reply({
+      content: 'pong',
+    });
+  }
 });
