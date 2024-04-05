@@ -268,13 +268,13 @@ const handleRejectModalSubmit = async (interaction, client) => {
       return;
     }
 
-    const hasSuccessfullySentUnderageLogMessage = await wrapAsyncCallbackInRetry(async () => {
+    const hasSuccessfullySentRejectionReasonLogMessage = await wrapAsyncCallbackInRetry(async () => {
       await client.channels.cache.get(getLogChannelId(interaction.guildId)).send({
         content: `${member.user} was rejected for the following reason: "${reason}"`,
       });
     }, 2);
 
-    if (!hasSuccessfullySentUnderageLogMessage) {
+    if (!hasSuccessfullySentRejectionReasonLogMessage) {
       return;
     }
   }
