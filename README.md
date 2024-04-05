@@ -6,6 +6,9 @@ You will require git and node.js (v20+)
 
 You will also require [pm2 to be globally installed](https://pm2.keymetrics.io/docs/usage/quick-start/)
 
+Make sure to have a discord developer account and a new bot (or app) registered
+(https://discord.com/developers/docs/quick-start/getting-started). These are the Ids you will need to use for one of the steps below.
+
 ### Initial Setup
 
 Clone the project using:
