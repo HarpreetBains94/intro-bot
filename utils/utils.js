@@ -1,3 +1,5 @@
+const { getModRoleId } = require("./serverConfigUtils");
+
 const wrapAsyncCallbackInRetry = async (asyncCallback, maxRetries) => {
   let hasSucceeded = false;
   let retries = 0;
@@ -15,6 +17,11 @@ const wrapAsyncCallbackInRetry = async (asyncCallback, maxRetries) => {
   return hasSucceeded;
 };
 
+const interactingUserHasApproverRole = (interaction) => {
+  return interaction.member.roles.cache.has(getModRoleId(interaction.guildId));
+};
+
 module.exports = {
-  wrapAsyncCallbackInRetry
+  wrapAsyncCallbackInRetry,
+  interactingUserHasApproverRole
 };

@@ -3,6 +3,7 @@ const { handleIntroModalSubmit, handleRejectModalSubmit, handleButtonClick, doAp
 const { getServers } = require('./utils/serverConfigUtils');
 const { doStickyStuff } = require('./utils/stickyUtils');
 const { doPrune } = require('./utils/purgeUtils');
+const { handleShowGenerateEmbedModal, handleEmbedModalSubmit } = require('./utils/embedUtil');
 
 // ############################
 // Initial Setup
@@ -51,6 +52,12 @@ async function setupCommands() {
       type: 6,
       required: true,
     }],
+  }, {
+    name: 'generate-embed',
+    description: 'Generate a simple embed'
+  }, {
+    name: 'generate-embed-help',
+    description: 'For help with the embed syntax'
   }
 ];
   await rest.put(Routes.applicationCommands(DISCORD_APP_ID), {
@@ -82,4 +89,17 @@ client.on('interactionCreate', async (interaction) => {
       content: 'pong',
     });
   }
+
+  if (interaction.commandName === 'generate-embed-help') {
+    await interaction.reply({
+      content: 'See https://discordjs.guide/popular-topics/embeds.html#embed-preview for a breakdown on what the different inputs mean.' +
+      '\n\nFor adding fields input a list of titles and content separated by double semi-colons (;;). There can be a max of 25 fields and field titles are limited to 256 characters and the content is limited to 1024 characters.\ne.g. Title 1;;Content 1;;Title 2;;Content 2' +
+      '\n\nFor the channel id, set your account in developer mode by going to advanced settings. After that you can right click on channels and copy their id.',
+      ephemeral: true
+    });
+  }
+
+  if(interaction.commandName === 'generate-embed') await handleShowGenerateEmbedModal(interaction);
+
+  if(interaction.isModalSubmit() && interaction.customId === 'embedModal') await handleEmbedModalSubmit(interaction, client);
 });

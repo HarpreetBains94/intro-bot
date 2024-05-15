@@ -1,5 +1,5 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { wrapAsyncCallbackInRetry } = require('./utils');
+const { wrapAsyncCallbackInRetry, interactingUserHasApproverRole } = require('./utils');
 const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId, getServerHideIntroApproveFlow } = require('./serverConfigUtils');
 
 const getIntroModal = () => {
@@ -391,7 +391,7 @@ const getLogButtonMessage = (introMessage) => {
 };
 
 const handleButtonClick = async (interaction, client) => {
-  if (interactingUserHasApproverRole(interaction)) {
+  if (this.interactingUserHasApproverRole(interaction)) {
     if (interaction.customId === 'approve') handleApproveClick(interaction);
 
     if (interaction.customId === 'acknowledge') handleAcknowledgeClick(interaction);
@@ -405,10 +405,6 @@ const handleButtonClick = async (interaction, client) => {
     if (interaction.customId === 'reject') handleRejectClick(interaction);
   }
   if (interaction.customId === 'intro') handleShowIntroModal(interaction);
-};
-
-const interactingUserHasApproverRole = (interaction) => {
-  return interaction.member.roles.cache.has(getModRoleId(interaction.guildId));
 };
 
 const handleApproveClick = async (interaction) => {
@@ -713,7 +709,6 @@ const doApprove = async (interaction, client) => {
 };
 
 module.exports = {
-  interactingUserHasApproverRole,
   handleIntroModalSubmit,
   handleRejectModalSubmit,
   handleButtonClick,

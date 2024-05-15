@@ -1,11 +1,7 @@
 const { getRejectRoleId, getModRoleId, getServerRejectTime } = require('./serverConfigUtils');
-const { wrapAsyncCallbackInRetry } = require('./utils');
+const { wrapAsyncCallbackInRetry, interactingUserHasApproverRole } = require('./utils');
 
 const MILLISECONDS_IN_AN_HOUR = 3600000;
-
-const interactingUserHasApproverRole = (interaction) => {
-  return interaction.member.roles.cache.has(getModRoleId(interaction.guildId));
-};
 
 const getGuild = async (interaction, client) => {
   const maybeGuild = await client.guilds.fetch(interaction.guildId)

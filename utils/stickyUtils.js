@@ -41,7 +41,7 @@ const doStickyStuff = async (channel, introTitle, introMessage, client) => {
         .setColor(0x0099FF)
         .setTitle(introTitle)
         .setDescription(introMessage)
-        .setTimestamp()
+        .setTimestamp();
       channel.send({
         embeds: [embed],
         components: [row]});
