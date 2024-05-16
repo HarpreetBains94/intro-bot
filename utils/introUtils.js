@@ -391,7 +391,7 @@ const getLogButtonMessage = (introMessage) => {
 };
 
 const handleButtonClick = async (interaction, client) => {
-  if (this.interactingUserHasApproverRole(interaction)) {
+  if (interactingUserHasApproverRole(interaction)) {
     if (interaction.customId === 'approve') handleApproveClick(interaction);
 
     if (interaction.customId === 'acknowledge') handleAcknowledgeClick(interaction);
