@@ -73,7 +73,7 @@ async function setupCommands() {
       required: true,
       choices: [{
         name: 'photo id',
-        value: 'id',
+        value: 'photo id',
       }, {
         name: 'server',
         value: 'server',
