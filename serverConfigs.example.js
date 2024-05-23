@@ -16,6 +16,7 @@ module.exports = {
       rejectRoleId: '', // Id of the role you want to purge when using the purge command
       rejectTime: 72, // How long (in hours) a user has to get rid of the reject role before the purge reject script effects them
       hideIntroApproveFlow: false, // Hide the approve and reject buttons on intro log. This is useful for manual approval servers
+      verifiedRoleId: '', // Id of an extra verified role separate from approveRoleId. Used when calling /verify-user. Useful if your server has a section that requires manual verification (e.g. a nsfw section etc)
     }
   ]
 }

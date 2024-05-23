@@ -1,6 +1,6 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { wrapAsyncCallbackInRetry, interactingUserHasApproverRole } = require('./utils');
-const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId, getServerHideIntroApproveFlow } = require('./serverConfigUtils');
+const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId, getServerHideIntroApproveFlow, getVerifiedRoleId } = require('./serverConfigUtils');
 
 const getIntroModal = () => {
   const modal = new ModalBuilder()
@@ -708,9 +708,60 @@ const doApprove = async (interaction, client) => {
   }, 0);
 };
 
+const doVerify = async (interaction, client) => {
+  await wrapAsyncCallbackInRetry(async () => {
+    if (!interactingUserHasApproverRole(interaction)) {
+      await wrapAsyncCallbackInRetry(async () => {
+        await interaction.reply({
+          content: 'You do not have permissions to use this command.',
+          ephemeral: true,
+        });
+        return;
+      }, 2);
+      return;
+    }
+    const mod = interaction.member;
+    const verifiedRole = interaction.member.guild.roles.cache.get(getVerifiedRoleId(interaction.guildId));
+    const user = interaction.options.getUser('user');
+    const verificationType = interaction.options.getString('type');
+    const verificationServer = interaction.options.getString('server-name');
+    const member = interaction.member.guild.members.cache.get(user.id);
+    if (!member) {
+      await wrapAsyncCallbackInRetry(async () => {
+        await interaction.reply({
+          content: 'Interaction failed, please manually add the verified role.'
+        });
+      }, 2);
+      return;
+    }
+    const hasSuccessfullyAddedRole = await wrapAsyncCallbackInRetry(async () => {
+      await member.roles.add(verifiedRole);
+    }, 2);
+
+    let updates = `${mod.user} verified ${member.user}. Verification method: ${verificationType}.`;
+    if (verificationServer) {
+      updates += ` Verification server: ${verificationServer}`;
+    }
+
+    await wrapAsyncCallbackInRetry(async () => {
+      await client.channels.cache.get(getLogChannelId(interaction.guildId)).send({
+        content: updates,
+      });
+    }, 2);
+
+    await wrapAsyncCallbackInRetry(async () => {
+      await interaction.reply({
+        content: 'Interaction complete, check the log channel for the status',
+        ephemeral: true,
+      });
+    }, 2);
+  }, 0);
+};
+
 module.exports = {
   handleIntroModalSubmit,
   handleRejectModalSubmit,
   handleButtonClick,
   doApprove,
+  doVerify,
 };

@@ -1,5 +1,5 @@
 const { Client, IntentsBitField, Routes, REST } = require('discord.js');
-const { handleIntroModalSubmit, handleRejectModalSubmit, handleButtonClick, doApprove } = require('./utils/introUtils');
+const { handleIntroModalSubmit, handleRejectModalSubmit, handleButtonClick, doApprove, doVerify } = require('./utils/introUtils');
 const { getServers } = require('./utils/serverConfigUtils');
 const { doStickyStuff } = require('./utils/stickyUtils');
 const { doPrune } = require('./utils/purgeUtils');
@@ -58,6 +58,32 @@ async function setupCommands() {
   }, {
     name: 'generate-embed-help',
     description: 'For help with the embed syntax'
+  }, {
+    name: 'verify-user',
+    description: 'Manually verify a user',
+    options: [{
+      name: 'user',
+      description: 'User to verify',
+      type: 6,
+      required: true,
+    }, {
+      name: 'type',
+      description: 'Verification type',
+      type: 3,
+      required: true,
+      choices: [{
+        name: 'photo id',
+        value: 'id',
+      }, {
+        name: 'server',
+        value: 'server',
+      }],
+    }, {
+      name: 'server-name',
+      description: '(OPTIONAL) If verification type is server which server was it?',
+      type: 3,
+      required: false,
+    }],
   }
 ];
   await rest.put(Routes.applicationCommands(DISCORD_APP_ID), {
@@ -77,6 +103,8 @@ client.on('interactionCreate', async (interaction) => {
   if(interaction.commandName === 'purge-rejects') await doPrune(interaction, client);
 
   if(interaction.commandName === 'approve-user') await doApprove(interaction, client);
+
+  if(interaction.commandName === 'verify-user') await doVerify(interaction, client);
   
   if(interaction.isModalSubmit() && interaction.customId === 'introModal') await handleIntroModalSubmit(interaction, client);
   
