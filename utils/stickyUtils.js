@@ -13,7 +13,7 @@ const shouldResendSticky = (lastChannelMessage, client) => {
   }
 };
 
-const doStickyStuff = async (channel, introTitle, introMessage, client) => {
+const doStickyStuff = async (channel, introTitle, introMessage, isBeginIntroSticky, client) => {
   var lastChannelMessage = null;
   await wrapAsyncCallbackInRetry(async () => {
     await channel.messages.fetch({ limit: 1 }).then(messages => {
@@ -29,22 +29,28 @@ const doStickyStuff = async (channel, introTitle, introMessage, client) => {
         })
       });
       await channel.bulkDelete(otherMessagesFromBot);
-      const intro = new ButtonBuilder()
-      .setCustomId('intro')
-      .setLabel('Begin Intro')
-      .setStyle(ButtonStyle.Primary);
-  
-      const row = new ActionRowBuilder()
-        .addComponents(intro);
-      
+
       const embed = new EmbedBuilder()
         .setColor(0x0099FF)
         .setTitle(introTitle)
         .setDescription(introMessage)
         .setTimestamp();
-      channel.send({
-        embeds: [embed],
-        components: [row]});
+
+      if (isBeginIntroSticky) {
+        const intro = new ButtonBuilder()
+        .setCustomId('intro')
+        .setLabel('Begin Intro')
+        .setStyle(ButtonStyle.Primary);
+    
+        const row = new ActionRowBuilder()
+          .addComponents(intro);
+
+        channel.send({
+          embeds: [embed],
+          components: [row]});
+      } else {
+        channel.send({ embeds: [embed] });
+      }
     }
   }, 2);
 };

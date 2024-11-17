@@ -686,7 +686,7 @@ const doApprove = async (interaction, client) => {
       await member.roles.remove(rejectRole);
     }, 2);
 
-    let updates = `${mod.user} approved ${member.user}: `;
+    let updates = `${mod.user} approved ${member.user} (${member.user.username}): `;
     updates += hasSuccessfullyAddedRole ? 'Successfully added approved role. ' : 'Failed to add approved role, please do it manually. ';
     updates += hasSuccessfullyRemovedRole ? 'Successfully removed reject role. ' : 'Failed to remove reject role, please do it manually. ';
     await wrapAsyncCallbackInRetry(async () => {
@@ -738,7 +738,7 @@ const doVerify = async (interaction, client) => {
       await member.roles.add(verifiedRole);
     }, 2);
 
-    let updates = `${mod.user} verified ${member.user}. Verification method: ${verificationType}.`;
+    let updates = `${mod.user} verified ${member.user}: (${member.user.username}). Verification method: ${verificationType}.`;
     if (verificationServer) {
       updates += ` Verification server: ${verificationServer}`;
     }

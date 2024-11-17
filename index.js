@@ -1,6 +1,6 @@
 const { Client, IntentsBitField, Routes, REST } = require('discord.js');
 const { handleIntroModalSubmit, handleRejectModalSubmit, handleButtonClick, doApprove, doVerify } = require('./utils/introUtils');
-const { getServers } = require('./utils/serverConfigUtils');
+const { getServers, getStickies } = require('./utils/serverConfigUtils');
 const { doStickyStuff } = require('./utils/stickyUtils');
 const { doPrune } = require('./utils/purgeUtils');
 const { handleShowGenerateEmbedModal, handleEmbedModalSubmit } = require('./utils/embedUtil');
@@ -26,13 +26,17 @@ const rest = new REST({version: '10'}).setToken(DISCORD_DEV_TOKEN);
 client.once('ready', (c) => {
     console.log(`${c.user.tag} Loaded!`);
     setInterval(async () => {
-      getServers().forEach(async (server) => {
-        const channel = client.channels.cache.get(server.startChannelId);
+      const stickies = [];
+      getServers().forEach((server) => {
+        stickies.push(...getStickies(server.id));
+      })
+      stickies.forEach(async (sticky) => {
+        const channel = client.channels.cache.get(sticky.channelId);
         if (!!channel) {
-          await doStickyStuff(channel, server.introTitle, server.introMessage, client);
+          await doStickyStuff(channel, sticky.stickyTitle, sticky.stickyMessage, sticky.isBeginIntroSticky, client);
         }
       })
-    }, 30000);
+    }, 60000);
 });
 
 async function setupCommands() {

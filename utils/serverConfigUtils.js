@@ -58,6 +58,11 @@ const getServerHideIntroApproveFlow = (id) => {
   return server.hideIntroApproveFlow;
 };
 
+const getStickies = (id) => {
+  const server = getServerForId(id);
+  return server.stickies;
+};
+
 const getServers = () => {
   return servers;
 };
@@ -73,5 +78,6 @@ module.exports = {
   getServerName,
   getServers,
   getServerRejectTime,
-  getServerHideIntroApproveFlow
+  getServerHideIntroApproveFlow,
+  getStickies,
 };
