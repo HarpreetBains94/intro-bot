@@ -45,6 +45,9 @@ async function setupCommands() {
     name: 'purge-rejects',
     description: 'Purge users with the reject role',
   }, {
+    name: 'test-purge-rejects',
+    description: 'Show who would be purged if the purge command was run',
+  }, {
     name: 'ping',
     description: 'Check if the bot is up',
   }, {
@@ -104,7 +107,9 @@ process.on('unhandledRejection', error => {
 });
 
 client.on('interactionCreate', async (interaction) => {
-  if(interaction.commandName === 'purge-rejects') await doPrune(interaction, client);
+  if(interaction.commandName === 'purge-rejects') await doPrune(interaction, client, false);
+
+  if(interaction.commandName === 'test-purge-rejects') await doTestPrune(interaction, client, true);
 
   if(interaction.commandName === 'approve-user') await doApprove(interaction, client);
 

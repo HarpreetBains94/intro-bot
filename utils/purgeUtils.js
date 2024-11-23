@@ -11,7 +11,7 @@ const getGuild = async (interaction, client) => {
   return maybeGuild;
 };
 
-const doPrune = async (interaction, client) => {
+const doPrune = async (interaction, client, isTest) => {
   const rejectTime = getServerRejectTime(interaction.guildId);
   await wrapAsyncCallbackInRetry(async () => {
     if (!interactingUserHasApproverRole(interaction)) {
@@ -36,11 +36,13 @@ const doPrune = async (interaction, client) => {
     rolesManager.members.forEach(member => {
       if (((new Date().getTime() - member.joinedTimestamp) / MILLISECONDS_IN_AN_HOUR) > rejectTime) {
         members.push(member);
-        member.kick();
+        if (!isTest) {
+          member.kick();
+        }
       }
     });
     await interaction.reply({
-      content: `Purged the following members: ${members}`,
+      content: isTest ? `The following members would be purged if the command was run: ${members}` : `Purged the following members: ${members}`,
       ephemeral: true,
     })
   }, 2);
