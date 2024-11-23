@@ -1,5 +1,6 @@
 const { getRejectRoleId, getModRoleId, getServerRejectTime } = require('./serverConfigUtils');
 const { wrapAsyncCallbackInRetry, interactingUserHasApproverRole } = require('./utils');
+const { PermissionsBitField } = require('discord.js');
 
 const MILLISECONDS_IN_AN_HOUR = 3600000;
 
@@ -36,16 +37,42 @@ const doPrune = async (interaction, client, isTest) => {
     rolesManager.members.forEach(member => {
       if (((new Date().getTime() - member.joinedTimestamp) / MILLISECONDS_IN_AN_HOUR) > rejectTime) {
         members.push(member);
-        if (!isTest) {
-          member.kick();
-        }
       }
     });
+    if (!isTest) {
+      removeTicketChannels(interaction, client, members);
+      members.forEach(member => {
+        member.kick();
+      })
+    }
     await interaction.reply({
       content: isTest ? `The following members would be purged if the command was run: ${members}` : `Purged the following members: ${members}`,
       ephemeral: true,
     })
   }, 2);
+};
+
+// This relies on the fact that ticket channels from the ticket tool
+// are private and have the member who created the ticket as a manual override
+// so they can view it. So passing in a list of all the members that are about
+// to be kicked and checking if they can view a ticket channel can be used to
+// delete their verification tickets
+const removeTicketChannels = async(interaction, client, members) => {
+  const channels = [];
+  const channelsToDelete = [];
+  client.channels.cache.filter(channel => channel.guildId == interaction.guildId && channel.name.startsWith('ticket')).each(channel => channels.push(channel));
+  members.forEach(member => {
+    channels.forEach(channel => {
+      if (member.permissionsIn(channel).has([PermissionsBitField.Flags.ViewChannel])) {
+        channelsToDelete.push(channel);
+      }
+    });
+  });
+  channelsToDelete.forEach((channel => {
+    if (interaction.guild.members.me.permissionsIn(channel).has([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ManageChannels])) {
+      channel.delete();
+    }
+  }));
 };
 
 module.exports = {
