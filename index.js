@@ -109,7 +109,7 @@ process.on('unhandledRejection', error => {
 client.on('interactionCreate', async (interaction) => {
   if(interaction.commandName === 'purge-rejects') await doPrune(interaction, client, false);
 
-  if(interaction.commandName === 'test-purge-rejects') await doTestPrune(interaction, client, true);
+  if(interaction.commandName === 'test-purge-rejects') await doPrune(interaction, client, true);
 
   if(interaction.commandName === 'approve-user') await doApprove(interaction, client);
 
