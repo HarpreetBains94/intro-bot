@@ -1,5 +1,5 @@
 const { getRejectRoleId, getModRoleId, getServerRejectTime } = require('./serverConfigUtils');
-const { wrapAsyncCallbackInRetry, interactingUserHasApproverRole } = require('./utils');
+const { wrapAsyncCallbackInRetry, interactingUserHasModRole } = require('./utils');
 const { PermissionsBitField } = require('discord.js');
 
 const MILLISECONDS_IN_AN_HOUR = 3600000;
@@ -15,7 +15,7 @@ const getGuild = async (interaction, client) => {
 const doPrune = async (interaction, client, isTest) => {
   const rejectTime = getServerRejectTime(interaction.guildId);
   await wrapAsyncCallbackInRetry(async () => {
-    if (!interactingUserHasApproverRole(interaction)) {
+    if (!interactingUserHasModRole(interaction)) {
       await interaction.reply({
         content: 'You do not have permissions to use this command.',
         ephemeral: true,

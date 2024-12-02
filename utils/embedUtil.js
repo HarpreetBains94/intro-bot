@@ -1,8 +1,8 @@
 const { EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require("discord.js");
-const { wrapAsyncCallbackInRetry, interactingUserHasApproverRole } = require("./utils");
+const { wrapAsyncCallbackInRetry, interactingUserHasModRole } = require("./utils");
 
 const handleShowGenerateEmbedModal = async (interaction) => {
-  if (!interactingUserHasApproverRole(interaction)) {
+  if (!interactingUserHasModRole(interaction)) {
     return;
   }
   await wrapAsyncCallbackInRetry(async () => {

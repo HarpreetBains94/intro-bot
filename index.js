@@ -2,6 +2,7 @@ const { Client, IntentsBitField, Routes, REST } = require('discord.js');
 const { handleIntroModalSubmit, handleRejectModalSubmit, handleButtonClick, doApprove, doVerify } = require('./utils/introUtils');
 const { getServers, getStickies } = require('./utils/serverConfigUtils');
 const { doStickyStuff } = require('./utils/stickyUtils');
+const { inviteUserToChannel } = require('./utils/channelUtils');
 const { doPrune } = require('./utils/purgeUtils');
 const { handleShowGenerateEmbedModal, handleEmbedModalSubmit } = require('./utils/embedUtil');
 
@@ -60,6 +61,15 @@ async function setupCommands() {
       required: true,
     }],
   }, {
+    name: 'invite-user-to-channel',
+    description: 'Gives a user view the current channel',
+    options: [{
+      name: 'user',
+      description: 'User to invite',
+      type: 6,
+      required: true,
+    }],
+  }, {
     name: 'generate-embed',
     description: 'Generate a simple embed'
   }, {
@@ -112,6 +122,8 @@ client.on('interactionCreate', async (interaction) => {
   if(interaction.commandName === 'test-purge-rejects') await doPrune(interaction, client, true);
 
   if(interaction.commandName === 'approve-user') await doApprove(interaction, client);
+
+  if(interaction.commandName === 'invite-user-to-channel') await inviteUserToChannel(interaction, client);
 
   if(interaction.commandName === 'verify-user') await doVerify(interaction, client);
   

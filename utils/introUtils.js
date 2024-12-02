@@ -1,5 +1,5 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { wrapAsyncCallbackInRetry, interactingUserHasApproverRole } = require('./utils');
+const { wrapAsyncCallbackInRetry, interactingUserHasModRole } = require('./utils');
 const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId, getServerHideIntroApproveFlow, getVerifiedRoleId } = require('./serverConfigUtils');
 
 const getIntroModal = () => {
@@ -391,7 +391,7 @@ const getLogButtonMessage = (introMessage) => {
 };
 
 const handleButtonClick = async (interaction, client) => {
-  if (interactingUserHasApproverRole(interaction)) {
+  if (interactingUserHasModRole(interaction)) {
     if (interaction.customId === 'approve') handleApproveClick(interaction);
 
     if (interaction.customId === 'acknowledge') handleAcknowledgeClick(interaction);
@@ -654,7 +654,7 @@ const handleNoMember = async (interaction) => {
 
 const doApprove = async (interaction, client) => {
   await wrapAsyncCallbackInRetry(async () => {
-    if (!interactingUserHasApproverRole(interaction)) {
+    if (!interactingUserHasModRole(interaction)) {
       await wrapAsyncCallbackInRetry(async () => {
         await interaction.reply({
           content: 'You do not have permissions to use this command.',
@@ -710,7 +710,7 @@ const doApprove = async (interaction, client) => {
 
 const doVerify = async (interaction, client) => {
   await wrapAsyncCallbackInRetry(async () => {
-    if (!interactingUserHasApproverRole(interaction)) {
+    if (!interactingUserHasModRole(interaction)) {
       await wrapAsyncCallbackInRetry(async () => {
         await interaction.reply({
           content: 'You do not have permissions to use this command.',

@@ -17,11 +17,11 @@ const wrapAsyncCallbackInRetry = async (asyncCallback, maxRetries) => {
   return hasSucceeded;
 };
 
-const interactingUserHasApproverRole = (interaction) => {
+const interactingUserHasModRole = (interaction) => {
   return interaction.member.roles.cache.has(getModRoleId(interaction.guildId));
 };
 
 module.exports = {
   wrapAsyncCallbackInRetry,
-  interactingUserHasApproverRole
+  interactingUserHasModRole
 };
