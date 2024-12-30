@@ -5,6 +5,7 @@ const { doStickyStuff } = require('./utils/stickyUtils');
 const { inviteUserToChannel } = require('./utils/channelUtils');
 const { doPrune } = require('./utils/purgeUtils');
 const { handleShowGenerateEmbedModal, handleEmbedModalSubmit } = require('./utils/embedUtil');
+const { handleAttachmentDelete } = require('./utils/utils');
 
 // ############################
 // Initial Setup
@@ -101,6 +102,15 @@ async function setupCommands() {
       type: 3,
       required: false,
     }],
+  }, {
+    name: 'delete-ticket-attachment',
+    description: 'Deletes images within ticket channels',
+    options: [{
+      name: 'message-id',
+      description: 'Id of message containing image(s)',
+      type: 3,
+      required: true,
+    }],
   }
 ];
   await rest.put(Routes.applicationCommands(DISCORD_APP_ID), {
@@ -151,4 +161,6 @@ client.on('interactionCreate', async (interaction) => {
   if(interaction.commandName === 'generate-embed') await handleShowGenerateEmbedModal(interaction);
 
   if(interaction.isModalSubmit() && interaction.customId === 'embedModal') await handleEmbedModalSubmit(interaction, client);
+
+  if(interaction.commandName === 'delete-ticket-attachment') await handleAttachmentDelete(interaction, client);
 });

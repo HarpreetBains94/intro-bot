@@ -1,6 +1,6 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { wrapAsyncCallbackInRetry, interactingUserHasModRole } = require('./utils');
-const { getLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId, getServerHideIntroApproveFlow, getVerifiedRoleId } = require('./serverConfigUtils');
+const { getIntroLogChannelId, getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId, getServerHideIntroApproveFlow, getVerifiedRoleId } = require('./serverConfigUtils');
 
 const getIntroModal = () => {
   const modal = new ModalBuilder()
@@ -269,7 +269,7 @@ const handleRejectModalSubmit = async (interaction, client) => {
     }
 
     const hasSuccessfullySentRejectionReasonLogMessage = await wrapAsyncCallbackInRetry(async () => {
-      await client.channels.cache.get(getLogChannelId(interaction.guildId)).send({
+      await client.channels.cache.get(getIntroLogChannelId(interaction.guildId)).send({
         content: `${member.user} was rejected for the following reason: "${reason}"`,
       });
     }, 2);
@@ -292,7 +292,7 @@ const handleUnderageUser = async (interaction, age, client) => {
     .addComponents(ban);
 
   const hasSuccessfullySentUnderageLogMessage = await wrapAsyncCallbackInRetry(async () => {
-    await client.channels.cache.get(getLogChannelId(interaction.guildId)).send({
+    await client.channels.cache.get(getIntroLogChannelId(interaction.guildId)).send({
       content: `🚨👮<(Underage user detected. ${interaction.member.user} claims to be ${age} years old)🚨`,
       components: [row],
     });
@@ -367,7 +367,7 @@ const sendIntroAndLogMessage = async (interaction, client) => {
   }
 
   const hasSuccessfullySentUnderageLogMessage = await wrapAsyncCallbackInRetry(async () => {
-    client.channels.cache.get(getLogChannelId(interaction.guildId)).send({
+    client.channels.cache.get(getIntroLogChannelId(interaction.guildId)).send({
       content: getLogButtonMessage(introMessage),
       components: [row],
     });
@@ -690,7 +690,7 @@ const doApprove = async (interaction, client) => {
     updates += hasSuccessfullyAddedRole ? 'Successfully added approved role. ' : 'Failed to add approved role, please do it manually. ';
     updates += hasSuccessfullyRemovedRole ? 'Successfully removed reject role. ' : 'Failed to remove reject role, please do it manually. ';
     await wrapAsyncCallbackInRetry(async () => {
-      await client.channels.cache.get(getLogChannelId(interaction.guildId)).send({
+      await client.channels.cache.get(getIntroLogChannelId(interaction.guildId)).send({
         content: updates,
       });
     }, 2);
@@ -744,7 +744,7 @@ const doVerify = async (interaction, client) => {
     }
 
     await wrapAsyncCallbackInRetry(async () => {
-      await client.channels.cache.get(getLogChannelId(interaction.guildId)).send({
+      await client.channels.cache.get(getIntroLogChannelId(interaction.guildId)).send({
         content: updates,
       });
     }, 2);

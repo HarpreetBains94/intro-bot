@@ -8,7 +8,8 @@ module.exports = {
       name: '', // Server Name
       startChannelId: '', // Start channel (this is where the user generates intros)
       introChannelId: '', // Intro channel (this is where the generated intros will go)
-      logChannelId: '', // Log channel (this is where mods will be able to approve/reject intros)
+      introLogChannelId: '', // Intro Log channel (this is where mods will be able to approve/reject intros)
+      serverLogChannelId: '', // Server Log channel (where the general logs go. E.g. message deletion, etc)
       modRoleId: '',  // Id of the role you want to be able to approve/reject intros (usually mods)
       approvedRoleId: '', // Id of the role you want to give users once their intro is approved
       rejectRoleId: '', // Id of the role you want to purge when using the purge command

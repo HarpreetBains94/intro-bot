@@ -18,9 +18,14 @@ const getIntroChannelId = (id) => {
   return server.introChannelId;
 };
 
-const getLogChannelId = (id) => {
+const getIntroLogChannelId = (id) => {
   const server = getServerForId(id);
-  return server.logChannelId;
+  return server.introLogChannelId;
+};
+
+const getServerLogChannelId = (id) => {
+  const server = getServerForId(id);
+  return server.serverLogChannelId;
 };
 
 const getModRoleId = (id) => {
@@ -70,7 +75,8 @@ const getServers = () => {
 module.exports = {
   getStartChannelId,
   getIntroChannelId,
-  getLogChannelId,
+  getIntroLogChannelId,
+  getServerLogChannelId,
   getModRoleId,
   getApprovedRoleId,
   getRejectRoleId,
