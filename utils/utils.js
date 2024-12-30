@@ -34,6 +34,7 @@ const handleAttachmentDelete = async (interaction, client) => {
   const messageId = interaction.options.getString('message-id');
   const serverLogChannelId = getServerLogChannelId(interaction.guildId);
   const serverLogChannel = client.channels.cache.get(serverLogChannelId);
+  const interactionChannelName = interaction.channel.name;
 
   if (!messageId || !serverLogChannel) {
     await interaction.reply({
@@ -83,7 +84,7 @@ const handleAttachmentDelete = async (interaction, client) => {
 
   await wrapAsyncCallbackInRetry(async () => {
     await serverLogChannel.send({
-      content: `${mod} deleted a message containing attachments from ${message.author}`,
+      content: `${mod} deleted a message containing attachments from ${message.author} in ${interactionChannelName}`,
       files: attachments
     });
   }, 1);
