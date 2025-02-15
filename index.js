@@ -1,6 +1,6 @@
 const { Client, IntentsBitField, Routes, REST } = require('discord.js');
 const { handleIntroModalSubmit, handleRejectModalSubmit, handleButtonClick, doApprove, doVerify } = require('./utils/introUtils');
-const { getServers, getStickies } = require('./utils/serverConfigUtils');
+const { validateServerConfigs, getServers, getStickies } = require('./utils/serverConfigUtils');
 const { doStickyStuff } = require('./utils/stickyUtils');
 const { inviteUserToChannel } = require('./utils/channelUtils');
 const { doPrune } = require('./utils/purgeUtils');
@@ -27,6 +27,7 @@ const rest = new REST({version: '10'}).setToken(DISCORD_DEV_TOKEN);
 
 client.once('ready', (c) => {
     console.log(`${c.user.tag} Loaded!`);
+    validateServerConfigs();
     setInterval(async () => {
       const stickies = [];
       getServers().forEach((server) => {

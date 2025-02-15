@@ -1,6 +1,6 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { wrapAsyncCallbackInRetry, interactingUserHasModRole } = require('./utils');
-const { getIntroChannelId, getStartChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId, getServerHideIntroApproveFlow, getVerifiedRoleId } = require('./serverConfigUtils');
+const { getIntroChannelId, getApprovedRoleId, getModRoleId, getServerName, getRejectRoleId, getServerHideIntroApproveFlow, getVerifiedRoleId } = require('./serverConfigUtils');
 const { PermissionsBitField } = require('discord.js');
 
 const inviteUserToChannel = async (interaction, client) => {
