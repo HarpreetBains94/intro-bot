@@ -1,4 +1,4 @@
-const { getRejectRoleId, getModRoleId, getServerRejectTime } = require('./serverConfigUtils');
+const { getRejectRoleId, getModRoleId, getServerRejectTime, getIntroLogChannelId } = require('./serverConfigUtils');
 const { wrapAsyncCallbackInRetry, interactingUserHasModRole } = require('./utils');
 const { PermissionsBitField } = require('discord.js');
 
@@ -45,10 +45,20 @@ const doPrune = async (interaction, client, isTest) => {
         member.kick();
       })
     }
-    await interaction.reply({
-      content: isTest ? `The following members would be purged if the command was run: ${members}` : `Purged the following members: ${members}`,
-      ephemeral: true,
-    })
+    if (isTest) {
+      await interaction.reply({
+        content: `The following members would be purged if the command was run: ${members}`,
+        ephemeral: true,
+      });
+    } else {
+      await client.channels.cache.get(getIntroLogChannelId(interaction.guildId)).send({
+        content: `${interaction.user} purged the following members: ${members}`,
+      });
+      await interaction.reply({
+        content: `Members purged, check the logs channel to see more information`,
+        ephemeral: true,
+      });
+    }
   }, 2);
 };
 
