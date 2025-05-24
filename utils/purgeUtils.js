@@ -1,4 +1,4 @@
-const { getRejectRoleId, getModRoleId, getServerRejectTime, getIntroLogChannelId } = require('./serverConfigUtils');
+const { getRejectRoleId, getModRoleId, getServerRejectTime, getIntroLogChannelId, shouldAllowPurge } = require('./serverConfigUtils');
 const { wrapAsyncCallbackInRetry, interactingUserHasModRole } = require('./utils');
 const { PermissionsBitField } = require('discord.js');
 
