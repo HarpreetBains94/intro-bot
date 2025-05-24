@@ -87,6 +87,11 @@ module.exports = {
       */
       newIntroSeparator: '',
       /*
+      allowPurge: boolean
+      description: Whether the purge command should be allowed in the server.
+      */
+      allowPurge: true,
+      /*
       introQuestions: array
       description: An array containing the config for the questions to be asked in the intro generation modal.
         Note that discord modals only allow for 5 questions. If more than 5 question configs are defined below, discord will error out when trying to generate the intro generation modal.
@@ -213,6 +218,7 @@ module.exports = {
       minimumAge: 18,
       introModalTitle: 'Tell Us About Yourself',
       newIntroSeparator: '++++++++++++++++++++++++++',
+      allowPurge: true,
       introQuestions: [
         {
           id: 'ANS_1',

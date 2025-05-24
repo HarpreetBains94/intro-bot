@@ -15,6 +15,13 @@ const getGuild = async (interaction, client) => {
 const doPrune = async (interaction, client, isTest) => {
   const rejectTime = getServerRejectTime(interaction.guildId);
   await wrapAsyncCallbackInRetry(async () => {
+    if (!shouldAllowPurge(interaction.guildId)) {
+      await interaction.reply({
+        content: 'This servers configuration does not allow for this command to be run.',
+        ephemeral: true,
+      });
+      return;
+    }
     if (!interactingUserHasModRole(interaction)) {
       await interaction.reply({
         content: 'You do not have permissions to use this command.',

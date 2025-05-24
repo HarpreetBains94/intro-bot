@@ -89,6 +89,11 @@ const getNewIntroSeparator = (id) => {
   return server.newIntroSeparator;
 };
 
+const shouldAllowPurge = (id) => {
+  const server = getServerForId(id);
+  return server.allowPurge;
+}
+
 const validateServerConfigs = () => {
   const zodConfig = getZodServerSchema();
   servers.forEach((server) => {
@@ -112,6 +117,7 @@ const getZodServerSchema = () => {
     minimumAge: z.number().int(),
     introModalTitle: z.string(),
     newIntroSeparator: z.string(),
+    allowPurge: z.boolean(),
     introQuestions: z.array(
       z.object({
         id: z.string(),
@@ -158,5 +164,6 @@ module.exports = {
   getMinimumAge,
   getIntroModalTitle,
   getNewIntroSeparator,
+  shouldAllowPurge,
   validateServerConfigs
 };
