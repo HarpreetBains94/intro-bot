@@ -601,6 +601,7 @@ const doVerify = async (interaction, client) => {
     }
     const mod = interaction.member;
     const verifiedRole = interaction.member.guild.roles.cache.get(getVerifiedRoleId(interaction.guildId));
+    const rejectRole = interaction.member.guild.roles.cache.get(getRejectRoleId(interaction.guildId));
     const user = interaction.options.getUser('user');
     const verificationType = interaction.options.getString('type');
     const verificationServer = interaction.options.getString('server-name');
@@ -615,6 +616,10 @@ const doVerify = async (interaction, client) => {
     }
     const hasSuccessfullyAddedRole = await wrapAsyncCallbackInRetry(async () => {
       await member.roles.add(verifiedRole);
+    }, 2);
+
+    const hasSuccessfullyRemovedRole = await wrapAsyncCallbackInRetry(async () => {
+      await member.roles.remove(rejectRole);
     }, 2);
 
     let updates = `${mod.user} verified ${member.user}: (${member.user.username}). Verification method: ${verificationType}.`;
