@@ -614,13 +614,39 @@ const doVerify = async (interaction, client) => {
       }, 2);
       return;
     }
+
+    
     const hasSuccessfullyAddedRole = await wrapAsyncCallbackInRetry(async () => {
       await member.roles.add(verifiedRole);
     }, 2);
+    
+    if (hasSuccessfullyAddedRole) {
+      await interaction.reply({
+        content: 'Successfully added approved role',
+        ephemeral: true
+      });
+    } else {
+      await interaction.reply({
+        content: 'Failed to add approved role',
+        ephemeral: true
+      });
+    }
 
     const hasSuccessfullyRemovedRole = await wrapAsyncCallbackInRetry(async () => {
       await member.roles.remove(rejectRole);
     }, 2);
+
+    if (hasSuccessfullyRemovedRole) {
+      await interaction.followUp({
+        content: 'Successfully removed reject role',
+        ephemeral: true
+      });
+    } else {
+      await interaction.followUp({
+        content: 'Failed to remove reject role',
+        ephemeral: true
+      });
+    }
 
     let updates = `${mod.user} verified ${member.user}: (${member.user.username}). Verification method: ${verificationType}.`;
     if (verificationServer) {
@@ -634,7 +660,7 @@ const doVerify = async (interaction, client) => {
     }, 2);
 
     await wrapAsyncCallbackInRetry(async () => {
-      await interaction.reply({
+      await interaction.followUp({
         content: 'Interaction complete, check the log channel for the status',
         ephemeral: true,
       });
